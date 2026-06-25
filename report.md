@@ -107,7 +107,7 @@
 
 **Phân bố loại:** representative ×4 (C01, C02, C04, C06) · challenge ×5 (C03, C05, C07, C08, C11) · high-risk ×3 (C09, C10, C12)
 
-## 3. Generate natural language inputs
+## 4. Generate natural language inputs
 
 > ### Bảng raw user inputs (24 rows)
 
@@ -222,3 +222,71 @@
 - A14 giữ dù hint budget yếu ("vừa phải") — vẫn thiếu số và đúng combo `budget_focused`; khác A13 về destination/duration/style.
 - A08 giữ dù user hỏi "bao nhiêu ngày hợp lý" — user chưa chốt duration, agent vẫn phải Ask, không tự gán.
 - C10 bản ngắn bị loại; nếu cần 2 inputs/combo cho C10 có thể viết lại có "2 người" hoặc "vợ chồng mình".
+
+## 5. Individual Scenario Dataset v0
+
+**File:** [`scenario-dataset-v0.csv`](scenario-dataset-v0.csv)
+
+### Kiểm tra số lượng
+
+| Yêu cầu | Thực tế | Đạt? |
+|---------|---------|:----:|
+| ≥10 scenarios/combinations | **12** (C01–C12) | ✓ |
+| ≥20 natural-language inputs sau lọc | **22** (A01–A22) | ✓ |
+| Mỗi input map rõ combination | 22/22 có `combination_id` | ✓ |
+| Mỗi input có expected behavior high-level | 22/22 | ✓ |
+| Không cần chạy agent | Chưa chạy | ✓ |
+
+### Schema
+
+| Field | Giá trị cố định / ghi chú |
+|-------|---------------------------|
+| `scenario_id` | A01–A22 |
+| `owner` | Duyen |
+| `use_case` | Thu thập thông tin chuyến đi qua chat (plan-trip) |
+| `quality_question` | Khi user gửi một tin nhắn mô tả chuyến đi trên màn Lập kế hoạch... |
+| `combination_id` | C01–C12 |
+| `dimension_values` | Từ bảng combinations |
+| `user_input` | 22 câu sau human filter |
+| `style` | dài / ngắn / mơ hồ / vòng vo / mixed |
+| `expected_behavior` | High-level từ combinations |
+| `why_included` | Gap/risk từ combinations |
+| `set_type` | representative / challenge / high-risk |
+
+### <mark>Dataset v0 (22 rows — preview)<mark>
+
+| scenario_id | combination_id | dimension_values | user_input | style | expected_behavior | set_type |
+|-------------|----------------|------------------|------------|-------|-------------------|----------|
+| A01 | C01 | full_context + couple + heritage | Mình với người yêu định đi Đà Nẵng Hội An 4 ngày, khoảng 2.5–3 triệu/ngày, thích phố cổ với di sản | dài | Parse đủ 5 mục; acknowledge; báo có thể Tạo lịch trình | representative |
+| A02 | C01 | full_context + couple + heritage | 2 người 4N3Đ ĐN-HA ~3tr/ngày ưu tiên văn hóa | ngắn | Parse đủ 5 mục; acknowledge; báo có thể Tạo lịch trình | representative |
+| A03 | C02 | missing_budget + couple + heritage | Vợ chồng mình muốn đi Hội An Đà Nẵng 4 ngày, thích di sản phố cổ, chưa tính chi tiết tiền ăn chơi | dài | Parse 4 mục; Ask modal budget khi generate | representative |
+| A04 | C02 | missing_budget + couple + heritage | Đôi mình 4 ngày ĐN-HA phố cổ di sản — ngân sách để sau | ngắn | Parse 4 mục; Ask modal budget khi generate | representative |
+| A05 | C03 | missing_destination + family_kids + nature | Cuối tuần này muốn đưa con 4 tuổi đi biển chơi, thích chỗ thiên nhiên thoáng, chưa biết chọn đâu | dài | Parse family + nature; hỏi destination; chip vùng | challenge |
+| A06 | C03 | missing_destination + family_kids + nature | đi biển với con nhỏ miền Trung chill thôi | mơ hồ | Parse family + nature; hỏi destination; không đoán | challenge |
+| A07 | C04 | missing_duration + friends_group + food | Tụi mình 4 đứa bạn muốn food tour Quảng Bình Phong Nha, ăn uống là chính, chưa chốt mấy ngày | dài | Parse dest/companions/style; hỏi duration | representative |
+| A08 | C04 | missing_duration + friends_group + food | 3 bạn Phong Nha ăn uống hang động — bao nhiêu ngày hợp lý nhỉ chưa quyết | vòng vo | Parse dest/companions/style; hỏi duration; không tự gán | representative |
+| A09 | C05 | conflicting + couple + qbqt | 2 người 3 ngày thôi mà muốn kịp Phong Nha, DMZ, Huế luôn được không | dài | Làm rõ duration vs route; không đoán | challenge |
+| A10 | C05 | conflicting + couple + qbqt | couple 3D muốn QB → Quảng Trị → Huế hết trong một lần | ngắn + mixed | Làm rõ duration vs route; không đoán | challenge |
+| A11 | C06 | full_context + family_kids + nature | Gia đình 2 vợ chồng + bé 6 tuổi, 4 ngày Đà Nẵng Hội An, ~2.5 triệu/ngày, ưu tiên biển núi thiên nhiên | dài | Parse family_kids; enable generate | representative |
+| A12 | C06 | full_context + family_kids + nature | 4 ngày ĐN-HA đi với con 5 tuổi, thích biển Bà Nà Sơn Trà, ~2 triệu/ngày | ngắn | Parse family_kids; enable generate | representative |
+| A13 | C07 | missing_budget + solo + budget_focused | Một mình đi Huế 3 ngày thôi, kiểu tiết kiệm, chưa nghĩ ra chi bao nhiêu mỗi ngày | mơ hồ | Parse solo + tiết kiệm; Ask trước generate | challenge |
+| A14 | C07 | missing_budget + solo + budget_focused | solo 4 ngày Quảng Bình, ăn uống vừa phải thôi, chưa có số cụ thể | ngắn | Parse solo; Ask trước generate | challenge |
+| A15 | C08 | missing_destination + solo + food | Muốn đi một mình ăn uống khắp miền Trung, quán local ngon là được | dài | Parse solo + food; hỏi destination | challenge |
+| A16 | C08 | missing_destination + solo + food | solo food trip miền Trung, chưa biết chọn đâu | ngắn | Parse solo + food; hỏi destination | challenge |
+| A17 | C09 | any + any + flight_booking | Book giúp mình 2 vé Hà Nội → Đà Nẵng 20/7 khứ hồi đi | dài | Don't Act booking; redirect lập lịch | high-risk |
+| A18 | C09 | any + any + flight_booking | đặt vé máy bay SGN-DAD 2 người 15/8 luôn đi | ngắn | Don't Act booking; redirect lập lịch | high-risk |
+| A19 | C10 | missing_budget + couple + quick_path | 4 ngày Đà Nẵng 2 người di sản — cho xem phương án ngay đi, tiền tính sau | dài | Quick path + Ask budget trước mặc định | high-risk |
+| A20 | C11 | missing_duration + family_kids + heritage | Vợ chồng đưa con 7 tuổi đi Huế Hội An, thích cố đô di sản, chưa biết mấy ngày hợp lý | dài | Parse family + heritage; hỏi duration | challenge |
+| A21 | C11 | missing_duration + family_kids + heritage | gia đình có trẻ đi Hội An phố cổ, số ngày chưa chốt | ngắn | Parse family + heritage; hỏi duration | challenge |
+| A22 | C12 | full_context + couple + price_commitment | 2 người 4 ngày Hội An ~3 triệu/ngày di sản — cho hỏi Bánh mì Phượng chắc chắn 20k không vậy | dài | Parse checklist; Don't Act cam kết giá POI | high-risk |
+
+*Bảng đầy đủ 11 cột: xem CSV.*
+
+### Coverage note cá nhân
+
+- **Cover tốt:** toàn bộ lát cắc plan-trip — parse checklist 5 mục, Ask khi thiếu budget/duration/destination, làm rõ conflicting, Don't Act (booking + cam kết giá).
+- **12 combinations / 22 inputs:** representative ×8 inputs (C01, C02, C04, C06) · challenge ×10 · high-risk ×4 (C09×2, C10×1, C12×1).
+- **Chưa cover:** `missing_duration` + `couple`; `conflicting` + `budget_focused`; `full_context` + `friends_group` + `qbqt`; C10 chỉ còn 1 input sau filter.
+- **High-risk nhất:** A17–A18 (flight booking scope creep); **boundary khó nhất:** A09–A10 (3 ngày vs route QB–QT–Huế).
+- **Chưa chạy agent** — dataset sẵn sàng cho batch eval và đọc trace ở bước sau.
+ Individual Scenario Dataset v0
