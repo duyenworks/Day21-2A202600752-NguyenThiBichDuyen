@@ -21,3 +21,45 @@
 | Nếu agent fail ở đây, hậu quả là gì? | **Mất trust sớm:** user bỏ app trước khi thấy lịch nháp (drop-off tại plan-trip). Lịch sai từ gốc: parse sai destination/duration → 4 phương án lịch trình đều không phù hợp. Giả định ngầm: tự gán budget hoặc style → lịch quá đắt/rẻ hoặc không khớp gu nhóm. Scope creep: user yêu cầu đặt vé → agent làm hoặc hứa hẹn → kỳ vọng sai về khả năng sản phẩm. Không hoàn thành task: user nói mơ hồ mà agent đoán bừa → phải sửa nhiều lần, tăng stress thay vì giảm. |
 | Behavior nào là bắt buộc? | - Parse đúng constraint user đã nói vào checklist 5 mục gồm *Đi đâu, Đi bao lâu, Đi cùng ai, Ngân sách, Phong cách đi (sở thích)*.<br> - Acknowledge ngắn gọn những gì đã hiểu.<br> - Hỏi tuần tự mục còn thiếu theo thứ tự: destination → duration → companions → budget → style. Đưa chip gợi ý cho mục đang hỏi.<br> - Ask trước khi giả định: thiếu budget → modal xác nhận trước khi dùng mặc định (~3 triệu/ngày).<br> - Làm rõ khi constraint mâu thuẫn (ví dụ 3 ngày nhưng muốn đi Phong Nha – DMZ – Huế).<br> - Don't Act khi user yêu cầu đặt vé/thanh toán — giải thích scope và redirect về lập lịch. |
 | Behavior nào bị cấm? | - Tự đoán destination hoặc số ngày khi user chưa nói / nói mơ hồ.<br> - Tự gán budget, style, companions mà user không đề cập.<br> - Generate lịch hoặc chuyển sang màn Chọn phương án khi thiếu thông tin quan trọng chưa được user xác nhận.<br> - Cam kết giá chính xác, giờ mở cửa, hoặc "chắc chắn" về POI khi chưa xác minh.<br> - Đặt vé, đặt phòng, thanh toán thay user.<br> - Bỏ qua hỏi mục checklist còn thiếu.<br> - Tự thêm context vào câu user (làm case dễ hơn thực tế). |
+
+
+
+## 2. Chọn dimensions và đánh giá tính đáng dùng của mỗi dimension
+
+> **Chọn dimensions**
+
+| Dimension | Values | Vì sao làm agent phải đổi behavior? |
+|-----------|--------|-------------------------------------|
+| Context completeness (Độ đầy đủ thông tin) | full_context, missing_destination, missing_duration, missing_budget, ambiguous, conflicting | Quyết định agent **parse tin nhắn từ user xong rồi làm gì tiếp**: hỏi destination / duration / budget, làm rõ mâu thuẫn, hay cho phép generate. |
+| Trip profile (Ai đi cùng) | couple, friends_group, family_kids, solo | Ảnh hưởng **companions** trong checklist và acknowledgment. Gia đình có trẻ → agent ghi nhận nhóm đặc biệt; solo → không gán "2 người"; nhóm bạn → parse "3–4 người". |
+| Style or constraint (Ưu tiên / ràng buộc đặc biệt) | heritage, food, nature, qbqt, budget_focused, quick_path, flight_booking, price_commitment | Đổi **style** trong checklist và chip gợi ý. quick_path → user muốn xem phương án sớm dù thiếu budget; flight_booking → Don't Act; price_commitment → không cam kết giá chính xác. |
+
+
+> **Kiểm tra tính đáng dùng của dimensions**
+
+***Dimension 1: Context completeness***
+
+| Câu hỏi kiểm tra | Trả lời |
+| ---------------- | ------- |
+| Nếu đổi value, expected behavior có đổi không? | Có. Mỗi value map sang bước xử lý khác: full_context → parse đủ 5 mục, báo có thể tạo lịch; missing_destination → hỏi đi đâu + chip vùng; missing_duration → hỏi số ngày; missing_budget → parse các mục khác, Ask modal khi generate; ambiguous → hỏi tuần tự, không đoán; conflicting → làm rõ mâu thuẫn (vd. 3 ngày vs multi-city), không generate. |
+| Dimension này có gắn với risk hoặc user outcome không? | Có. Generate sớm khi thiếu budget → lịch lệch ngân sách; thiếu destination nhưng tự ý dự đoán → lịch sai vùng. |
+| Dimension này có giúp tìm failure mà happy path không thấy không? | Có. Happy path (full_context) chỉ test parse + enable generate. Các value còn lại ép test: premature generate, đoán bừa, skip Ask budget, quick path khi thiếu thông tin — đều là failure thường gặp ngoài happy path. |
+| Có value nào quá generic hoặc khó quan sát không? | ambiguous hơi rộng — nên thiết lập định nghĩa cụ thể (ví dụ thiếu destination + câu mơ hồ) để dễ quan sát. Các value còn lại quan sát được qua checklist 5 mục và câu hỏi tiếp theo của agent. Kết luận: giữ, chuẩn hóa ambiguous khi viết combinations. |
+
+***Dimension 2: Trip profile***
+
+| Câu hỏi kiểm tra | Trả lời |
+| ---------------- | ------- |
+| Nếu đổi value, expected behavior có đổi không? | Có — ở mức parse + acknowledge. Agent điền field companions khác nhau: couple → "2 người (cặp đôi)"; friends → "Nhóm bạn (3–4 người)"; family_kids → "Gia đình có trẻ nhỏ"; solo → "Đi một mình". Acknowledgment khác ("ưu tiên địa điểm phù hợp với nhóm"). Lưu ý: Ở lát cắc plan-trip, behavior hỏi tiếp ít đổi hơn context completeness — chủ yếu **đổi nội dung parse**, không đổi Ask/Don't Act. |
+| Dimension này có gắn với risk hoặc user outcome không? | Có. Parse sai companions (gán couple cho gia đình có trẻ) → lịch phía sau không phù hợp (Bà Nà, trekking, nhịp chậm). |
+| Dimension này có giúp tìm failure mà happy path không thấy không? | Có — vừa phải. Giúp test parse từ ngôn ngữ tự nhiên ("vợ chồng", "4 đứa bạn", "con 5 tuổi", "một mình") và tránh default "cặp đôi" khi user là solo/family. Không tìm được failure kiểu Don't Act hay Ask budget — cần kết hợp dimension khác. |
+| Có value nào quá generic hoặc khó quan sát không? | Không. Mỗi value map 1-1 với mục checklist ĐI CÙNG AI, dễ quan sát pass/fail. friends_group vs couple đủ khác để không trùng behavior. |
+
+***Dimension 3: Style or request type***
+
+| Câu hỏi kiểm tra | Trả lời |
+| ---------------- | ------- |
+| Nếu đổi value, expected behavior có đổi không? | Có. Nhóm style (heritage / food / nature / qbqt): đổi field style trong checklist + chip gợi ý — behavior tương tự nhau (parse + hỏi mục thiếu). Nhóm constraint đặc biệt: quick_path → cảnh báo/Ask khi thiếu budget dù user muốn xem phương án ngay; flight_booking → Don't Act; price_commitment → từ chối cam kết giá/giờ chính xác. |
+| Dimension này có gắn với risk hoặc user outcome không? | Có — risk cao với constraint đặc biệt. flight_booking → scope creep; price_commitment → trust risk nếu agent hứa giá POI; budget_focused → giả định budget sai ảnh hưởng toàn lịch. Style thuần (heritage/food) — risk thấp hơn, chủ yếu ảnh hưởng gợi ý phương án sau này. |
+| Dimension này có giúp tìm failure mà happy path không thấy không? | Có. Happy path chỉ có heritage/food/nature. flight_booking, quick_path, price_commitment test boundary Act / Ask / Don't Act mà một mình context completeness không cover. |
+| Có value nào quá generic hoặc khó quan sát không? | Có. heritage / food / nature gần nhau về behavior ở plan-trip (chỉ khác string style) — dễ trùng combinations. Suggestion: giữ dimension nhưng khi chọn combinations, ưu tiên value làm đổi policy (quick_path, flight_booking, price_commitment, budget_focused) hơn chỉ đổi label style. |
