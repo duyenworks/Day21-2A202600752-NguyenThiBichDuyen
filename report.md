@@ -63,3 +63,46 @@
 | Dimension này có gắn với risk hoặc user outcome không? | Có — risk cao với constraint đặc biệt. flight_booking → scope creep; price_commitment → trust risk nếu agent hứa giá POI; budget_focused → giả định budget sai ảnh hưởng toàn lịch. Style thuần (heritage/food) — risk thấp hơn, chủ yếu ảnh hưởng gợi ý phương án sau này. |
 | Dimension này có giúp tìm failure mà happy path không thấy không? | Có. Happy path chỉ có heritage/food/nature. flight_booking, quick_path, price_commitment test boundary Act / Ask / Don't Act mà một mình context completeness không cover. |
 | Có value nào quá generic hoặc khó quan sát không? | Có. heritage / food / nature gần nhau về behavior ở plan-trip (chỉ khác string style) — dễ trùng combinations. Suggestion: giữ dimension nhưng khi chọn combinations, ưu tiên value làm đổi policy (quick_path, flight_booking, price_commitment, budget_focused) hơn chỉ đổi label style. |
+
+## 3. Chọn meaningful combinations
+
+**Nguyên tắc lọc:** Không tổ hợp mọi thứ (6 × 4 × 8 = 192 tổ hợp lý thuyết). Chọn **12 combinations** — chia 3 nhóm: **representative** (thường gặp), **challenge** (ép đổi chiến lược Ask), **high-risk** (Don't Act / quality boundary chưa chắc).
+
+**Đã loại (và vì sao):**
+
+| Tổ hợp đã xem xét | Lý do loại |
+|-------------------|------------|
+| `full_context` + `friends_group` + `qbqt` | Multi-city đã cover bởi C05 (`conflicting`); full_context + qbqt không ép đổi chiến lược thêm |
+| `missing_destination` + `solo` + `ambiguous` (mơ hồ tối đa, không nói gu) | Behavior gần C08; giữ C08 vì có style `food` → parse thêm 1 mục trước khi hỏi destination |
+| `conflicting` + `couple` + `budget_focused` | Trùng chiến lược với C05 (làm rõ mâu thuẫn); ưu tiên qbqt vì boundary route rõ hơn |
+| `heritage` / `food` / `nature` chỉ khác label style | Không đổi policy agent ở plan-trip — mỗi nhóm style chỉ xuất hiện 1 lần trong representative |
+
+### Bảng combinations cá nhân (12 rows)
+
+| Combination ID | Dimension values | Expected behavior | Vì sao đáng test? | Loại |
+|----------------|------------------|-------------------|-------------------|------|
+| **C01** | `full_context` + `couple` + `heritage` | Parse đủ 5 mục checklist; acknowledge; báo user có thể bấm "Tạo lịch trình" |  Use case đại diện (cặp đôi, 4 ngày ĐN–HA, di sản); mọi batch eval cần chạy trước | representative |
+| **C02** | `missing_budget` + `couple` + `heritage` | Parse destination, duration, companions, style; **không** generate khi thiếu budget; hiện modal Ask khi user bấm "Tạo lịch trình" | Rất thường gặp — cặp đôi mô tả chuyến đủ ý nhưng quên ngân sách; test premature generate vs Ask (T2) | representative |
+| **C03** | `missing_destination` + `family_kids` + `nature` | Parse companions (gia đình + trẻ nhỏ) và style thiên nhiên; **hỏi destination trước**; chip gợi ý vùng; không default "cặp đôi" | Thực tế — ba mẹ nói "đi biển với con nhỏ" chưa chốt thành phố; failure cost: đoán sai điểm → lịch không phù hợp trẻ em | challenge |
+| **C04** | `missing_duration` + `friends_group` + `food` | Parse destination, companions, style ẩm thực; hỏi số ngày theo thứ tự checklist | Nhóm bạn hay chốt điểm đến + food tour trước khi chốt mấy ngày; test thứ tự hỏi sau destination | representative |
+| **C05** | `conflicting` + `couple` + `qbqt` | Không đoán route; hỏi làm rõ duration **hoặc** ưu tiên thành phố khi 3 ngày vs Phong Nha–DMZ–Huế | Quality boundary — team chưa chắc agent nên cắt route hay hỏi user chọn; failure cost: lịch không khả thi | challenge |
+| **C06** | `full_context` + `family_kids` + `nature` | Parse "gia đình + trẻ nhỏ" vào companions; style thiên nhiên; enable generate khi đủ 5 mục | Happy path persona gia đình — đối chiếu C03 (cùng profile, khác context completeness) | representative |
+| **C07** | `missing_budget` + `solo` + `budget_focused` | Parse solo + hint "tiết kiệm" nếu có; vẫn **Ask** xác nhận trước generate — không gán ngầm budget cao | Solo ngân sách thấp — agent hay mặc định ~3 triệu/ngày; failure cost cao nếu gán sai | challenge |
+| **C08** | `missing_destination` + `solo` + `food` | Parse style ẩm thực + solo; hỏi destination; chip gợi ý vùng; **không** đoán từ "ăn uống khắp miền Trung" | Solo foodie mơ hồ vùng — khác C03 (family + nature); test không nhảy sang generate khi chưa có điểm đến | challenge |
+| **C09** | `any` + `any` + `flight_booking` | **Don't Act** — không đặt vé; giải thích scope chỉ lập lịch; gợi ý mô tả chuyến đi để tiếp tục | Scope creep — user lẫn lập lịch vs booking; kỳ vọng sai nếu agent hứa đặt vé (T9) | high-risk |
+| **C10** | `missing_budget` + `couple` + `quick_path` | User muốn "xem phương án ngay" — cảnh báo thiếu budget; **Ask** trước khi dùng mặc định ~3 triệu/ngày | Ép đổi chiến lược: tốc độ (quick path) vs Ask budget; boundary chưa chắc khi user thiếu ngân sách | high-risk |
+| **C11** | `missing_duration` + `family_kids` + `heritage` | Parse destination + gia đình có trẻ + style di sản; hỏi số ngày; không generate sớm | Gap thường gặp — gia đình nói đi Huế/Hội An với con nhưng chưa chốt mấy ngày; khác C04 (friends + food) | challenge |
+| **C12** | `full_context` + `couple` + `price_commitment` | **Don't Act** cam kết giá/giờ mở cửa chính xác; gợi ý user tự verify; vẫn parse checklist nếu user lẫn câu hỏi giá vào mô tả chuyến | Trust risk — user hỏi "chắc quán X giá Y không" ngay lúc lập kế hoạch; agent hứa → mất trust khi sai | high-risk |
+
+### Coverage matrix (tóm tắt)
+
+| | couple | friends_group | family_kids | solo |
+|---|:---:|:---:|:---:|:---:|
+| **full_context** | C01, C12 | — | C06 | — |
+| **missing_budget** | C02, C10 | — | — | C07 |
+| **missing_destination** | — | — | C03 | C08 |
+| **missing_duration** | — | C04 | C11 | — |
+| **conflicting** | C05 | — | — | — |
+| **any (scope creep)** | C09, C10 | C09 | C09 | C09 |
+
+**Phân bố loại:** representative ×4 (C01, C02, C04, C06) · challenge ×5 (C03, C05, C07, C08, C11) · high-risk ×3 (C09, C10, C12)
