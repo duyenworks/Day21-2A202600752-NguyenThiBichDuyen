@@ -1,5 +1,7 @@
 ## 1. Chọn use case và quality question
 
+> **Use case & Unit of AI Work**
+
 | Thành phần | Câu trả lời |
 |------------|-------------|
 | Use case từ Day 18/19 | Thu thập thông tin chuyến đi từ người dùng qua chat (màn hình Lập kế hoạch/plan-trip.html) |
@@ -10,5 +12,12 @@
 | Agent được phép làm gì? | **Act (rủi ro thấp)**: Parse và điền checklist từ câu user; acknowledge constraint; đưa chip gợi ý cho mục còn thiếu; hỏi tuần tự theo thứ tự: destination → duration → companions → budget → style. Ask (cần xác nhận): Hỏi lại khi thiếu thông tin; hiện modal xác nhận ngân sách mặc định (~3 triệu/ngày) trước khi tạo lịch; làm rõ khi constraint mâu thuẫn (ví dụ 3 ngày nhưng muốn đi nhiều thành phố)|
 | Agent không được phép làm gì? | **Don't Act**: Đặt vé máy bay / khách sạn / thanh toán thay user; cam kết giá hoặc giờ mở cửa chính xác khi chưa xác minh; tự đoán destination khi user mơ hồ ("đi chơi đâu đó"); tự generate lịch khi thiếu budget mà user chưa xác nhận; bỏ qua hỏi các mục checklist còn thiếu; tự thêm thông tin user không nói (ví dụ tự gán ngân sách mà không hỏi)|
 
+> **Quality question**
 
-
+| Câu hỏi | Câu trả lời |
+|----------|-------------|
+| Quality question chính | Khi user gửi một tin nhắn mô tả chuyến đi trên màn Lập kế hoạch, agent có ***hiểu đúng constraint đã nói***, ***hỏi đúng mục checklist còn thiếu***, và ***không cam kết / hành động khi thông tin chưa đủ hoặc ngoài phạm vi*** không? |
+| Vì sao câu hỏi này quan trọng với user? | Đây là bước đầu tiên trong hành trình lập lịch. User đến VinTravel vì không biết xếp lịch hợp lý — họ cần "app hiểu đúng chuyến đi của mình" trước khi tin vào bất kỳ phương án nào. Nếu agent hiểu sai hoặc bỏ qua thông tin quan trọng (ngân sách, số ngày, đi cùng ai), mọi lịch trình phía sau đều lệch nhu cầu thật → user mất trust → quay lại cách làm cũ tự lập lịch qua Google/Excel thay vì tiếp tục. |
+| Nếu agent fail ở đây, hậu quả là gì? | **Mất trust sớm:** user bỏ app trước khi thấy lịch nháp (drop-off tại plan-trip). Lịch sai từ gốc: parse sai destination/duration → 4 phương án lịch trình đều không phù hợp. Giả định ngầm: tự gán budget hoặc style → lịch quá đắt/rẻ hoặc không khớp gu nhóm. Scope creep: user yêu cầu đặt vé → agent làm hoặc hứa hẹn → kỳ vọng sai về khả năng sản phẩm. Không hoàn thành task: user nói mơ hồ mà agent đoán bừa → phải sửa nhiều lần, tăng stress thay vì giảm. |
+| Behavior nào là bắt buộc? | - Parse đúng constraint user đã nói vào checklist 5 mục gồm *Đi đâu, Đi bao lâu, Đi cùng ai, Ngân sách, Phong cách đi (sở thích)*.<br> - Acknowledge ngắn gọn những gì đã hiểu.<br> - Hỏi tuần tự mục còn thiếu theo thứ tự: destination → duration → companions → budget → style. Đưa chip gợi ý cho mục đang hỏi.<br> - Ask trước khi giả định: thiếu budget → modal xác nhận trước khi dùng mặc định (~3 triệu/ngày).<br> - Làm rõ khi constraint mâu thuẫn (ví dụ 3 ngày nhưng muốn đi Phong Nha – DMZ – Huế).<br> - Don't Act khi user yêu cầu đặt vé/thanh toán — giải thích scope và redirect về lập lịch. |
+| Behavior nào bị cấm? | - Tự đoán destination hoặc số ngày khi user chưa nói / nói mơ hồ.<br> - Tự gán budget, style, companions mà user không đề cập.<br> - Generate lịch hoặc chuyển sang màn Chọn phương án khi thiếu thông tin quan trọng chưa được user xác nhận.<br> - Cam kết giá chính xác, giờ mở cửa, hoặc "chắc chắn" về POI khi chưa xác minh.<br> - Đặt vé, đặt phòng, thanh toán thay user.<br> - Bỏ qua hỏi mục checklist còn thiếu.<br> - Tự thêm context vào câu user (làm case dễ hơn thực tế). |
