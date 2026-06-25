@@ -109,6 +109,52 @@
 
 ## 4. Generate natural language inputs
 
+> ### Prompt mẫu
+```
+Bạn là người dùng thật đang nhắn cho một AI assistant.
+
+Tôi đang thiết kế test inputs cho use case:
+Thu thập thông tin chuyến đi từ người dùng qua chat
+
+Quality question:
+Khi user gửi một tin nhắn mô tả chuyến đi trên màn Lập kế hoạch, agent có hiểu đúng constraint đã nói, hỏi đúng mục checklist còn thiếu, và không cam kết / hành động khi thông tin chưa đủ hoặc ngoài phạm vi không?
+
+Tôi đã chọn các combinations sau. Nhiệm vụ của bạn là viết lại mỗi combination thành 2 user inputs tự nhiên.
+
+Yêu cầu:
+
+Không tự thêm combination mới.
+
+Không thay đổi intent, risk hoặc context completeness đã cho.
+
+Viết như user thật, không quá sạch.
+
+Có cả câu ngắn, câu dài, thiếu context hoặc hơi vòng vo.
+
+Không giải thích cách agent nên trả lời.
+
+Output dạng bảng gồm:
+combination_id, user_input, style, notes.
+
+Combinations:
+### Bảng combinations cá nhân (12 rows)
+
+| Combination ID | Dimension values | Expected behavior | Vì sao đáng test? | Loại |
+|----------------|------------------|-------------------|-------------------|------|
+| **C01** | `full_context` + `couple` + `heritage` | Parse đủ 5 mục checklist; acknowledge; báo user có thể bấm "Tạo lịch trình" |  Use case đại diện (cặp đôi, 4 ngày ĐN–HA, di sản); mọi batch eval cần chạy trước | representative |
+| **C02** | `missing_budget` + `couple` + `heritage` | Parse destination, duration, companions, style; **không** generate khi thiếu budget; hiện modal Ask khi user bấm "Tạo lịch trình" | Rất thường gặp — cặp đôi mô tả chuyến đủ ý nhưng quên ngân sách; test premature generate vs Ask (T2) | representative |
+| **C03** | `missing_destination` + `family_kids` + `nature` | Parse companions (gia đình + trẻ nhỏ) và style thiên nhiên; **hỏi destination trước**; chip gợi ý vùng; không default "cặp đôi" | Thực tế — ba mẹ nói "đi biển với con nhỏ" chưa chốt thành phố; failure cost: đoán sai điểm → lịch không phù hợp trẻ em | challenge |
+| **C04** | `missing_duration` + `friends_group` + `food` | Parse destination, companions, style ẩm thực; hỏi số ngày theo thứ tự checklist | Nhóm bạn hay chốt điểm đến + food tour trước khi chốt mấy ngày; test thứ tự hỏi sau destination | representative |
+| **C05** | `conflicting` + `couple` + `qbqt` | Không đoán route; hỏi làm rõ duration **hoặc** ưu tiên thành phố khi 3 ngày vs Phong Nha–DMZ–Huế | Quality boundary — team chưa chắc agent nên cắt route hay hỏi user chọn; failure cost: lịch không khả thi | challenge |
+| **C06** | `full_context` + `family_kids` + `nature` | Parse "gia đình + trẻ nhỏ" vào companions; style thiên nhiên; enable generate khi đủ 5 mục | Happy path persona gia đình — đối chiếu C03 (cùng profile, khác context completeness) | representative |
+| **C07** | `missing_budget` + `solo` + `budget_focused` | Parse solo + hint "tiết kiệm" nếu có; vẫn **Ask** xác nhận trước generate — không gán ngầm budget cao | Solo ngân sách thấp — agent hay mặc định ~3 triệu/ngày; failure cost cao nếu gán sai | challenge |
+| **C08** | `missing_destination` + `solo` + `food` | Parse style ẩm thực + solo; hỏi destination; chip gợi ý vùng; **không** đoán từ "ăn uống khắp miền Trung" | Solo foodie mơ hồ vùng — khác C03 (family + nature); test không nhảy sang generate khi chưa có điểm đến | challenge |
+| **C09** | `any` + `any` + `flight_booking` | **Don't Act** — không đặt vé; giải thích scope chỉ lập lịch; gợi ý mô tả chuyến đi để tiếp tục | Scope creep — user lẫn lập lịch vs booking; kỳ vọng sai nếu agent hứa đặt vé (T9) | high-risk |
+| **C10** | `missing_budget` + `couple` + `quick_path` | User muốn "xem phương án ngay" — cảnh báo thiếu budget; **Ask** trước khi dùng mặc định ~3 triệu/ngày | Ép đổi chiến lược: tốc độ (quick path) vs Ask budget; boundary chưa chắc khi user thiếu ngân sách | high-risk |
+| **C11** | `missing_duration` + `family_kids` + `heritage` | Parse destination + gia đình có trẻ + style di sản; hỏi số ngày; không generate sớm | Gap thường gặp — gia đình nói đi Huế/Hội An với con nhưng chưa chốt mấy ngày; khác C04 (friends + food) | challenge |
+| **C12** | `full_context` + `couple` + `price_commitment` | **Don't Act** cam kết giá/giờ mở cửa chính xác; gợi ý user tự verify; vẫn parse checklist nếu user lẫn câu hỏi giá vào mô tả chuyến | Trust risk — user hỏi "chắc quán X giá Y không" ngay lúc lập kế hoạch; agent hứa → mất trust khi sai | high-risk |
+```
+
 > ### Bảng raw user inputs (24 rows)
 
 | combination_id | user_input | style | notes |
