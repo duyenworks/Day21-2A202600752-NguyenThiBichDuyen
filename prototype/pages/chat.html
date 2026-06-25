@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trợ lý AI — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="has-bottom-nav">
+  <div id="app-shell">
+    <main class="app-main" data-main>
+      <div style="padding:1.5rem 2rem;flex:1;display:flex;flex-direction:column;">
+        <p style="font-size:0.85rem;margin-bottom:0.75rem;">
+          <a href="plan-trip.html">← Quay lại lập kế hoạch</a>
+          · <a href="review.html">Xem lịch trình hiện tại</a>
+        </p>
+        <h2 style="font-size:1.5rem;margin-bottom:1rem;" id="chat-heading">Hôm nay bạn muốn khám phá gì?</h2>
+        <div class="chat-messages" id="chat-area"></div>
+        <div class="quick-actions">
+          <button class="quick-action purple" type="button" data-style="heritage">🏛 Di sản</button>
+          <button class="quick-action teal" type="button" data-style="nature">🌿 Thiên nhiên</button>
+          <button class="quick-action salmon" type="button" data-style="food">🍜 Ẩm thực</button>
+          <button class="quick-action gold" type="button" id="new-trip-btn">📅 Tạo chuyến mới</button>
+        </div>
+        <div class="input-box" style="margin-top:auto;">
+          <input type="text" id="chat-input" placeholder="Hỏi về địa điểm, thời gian, ngân sách…" aria-label="Tin nhắn">
+          <button class="btn btn-primary btn-sm" id="send-chat">Gửi</button>
+        </div>
+        <p class="disclaimer">VinTravel gợi ý lịch trình — kiểm tra thông tin quan trọng trước khi đi.</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/mock-ai.js"></script>
+  <script src="../assets/js/app-shell.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    const trip = VinTravelState.load();
+    const dest = trip.destination || 'miền Trung';
+    VinTravelAppShell.mount('app-shell', { activePage: 'chat', discoveryContext: dest });
+
+    const area = document.getElementById('chat-area');
+    const styleNote = trip.style ? `Dựa trên sở thích <strong>${trip.style}</strong> bạn đã chọn.` : 'Bắt đầu bằng cách mô tả chuyến đi hoặc chọn gợi ý bên phải.';
+    area.innerHTML = `
+      <div class="message ai">
+        <div class="ai-label">VinTravel</div>
+        <div class="chat-with-map">
+          <div>
+            <p><strong>${dest}</strong> — mình có thể gợi ý địa điểm, nhịp độ và phương án lịch trình. ${styleNote}</p>
+            <p style="margin-top:0.5rem;font-size:0.85rem;color:var(--color-gray-600);">
+              Chưa có lịch trình? <a href="plan-trip.html">Lập kế hoạch mới →</a>
+            </p>
+          </div>
+          <div class="inline-map">
+            <img src="https://images.unsplash.com/photo-1528183429752-a97d0bf99f5e?w=400" alt="Bản đồ miền Trung">
+            <span class="map-pin" style="top:42%;left:54%;" title="Đà Nẵng"></span>
+            <span class="map-pin" style="top:48%;left:51%;" title="Hội An"></span>
+          </div>
+        </div>
+      </div>`;
+
+    function appendAndScroll(html) {
+      area.innerHTML += html;
+      VinTravelUI.scrollChatToBottom('chat-area');
+    }
+
+    document.getElementById('send-chat').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+      const val = document.getElementById('chat-input').value.trim();
+      if (!val) return;
+      appendAndScroll(`<div class="message user">${val}</div>`);
+      const updates = VinTravelAI.parseUserInput(val);
+      if (Object.keys(updates).length) VinTravelState.save(updates);
+
+      setTimeout(() => {
+        let reply = 'Mình đã cập nhật thông tin chuyến đi. Bạn có thể xem gợi ý bên phải hoặc <a href="itineraries.html">chọn phương án lịch trình</a>.';
+        const lower = val.toLowerCase();
+        if (lower.includes('quảng bình') || lower.includes('phong nha')) {
+          reply = 'Quảng Bình nổi tiếng với Động Phong Nha và Suối Moọc — nên đi tháng 3–8. Chạm thẻ bên phải để thêm vào gợi ý.';
+          VinTravelAppShell.updateDiscovery('app-shell', 'quảng bình');
+        } else if (lower.includes('quảng trị') || lower.includes('dmz')) {
+          reply = 'Khu DMZ Quảng Trị phù hợp tour nửa ngày — nên đi cùng Huế hoặc Phong Nha.';
+          VinTravelAppShell.updateDiscovery('app-shell', 'quảng trị');
+        } else if (lower.includes('mệt') || lower.includes('quá dày')) {
+          reply = 'Nghe có vẻ lịch hơi dày. Mở <a href="review.html">lịch trình</a> và bấm "Điều chỉnh lịch nhẹ hơn" để rút bớt hoạt động.';
+        }
+        appendAndScroll(`<div class="message ai"><div class="ai-label">VinTravel</div><p>${reply}</p></div>`);
+      }, 700);
+      document.getElementById('chat-input').value = '';
+    }
+
+    const styleMap = {
+      heritage: { style: 'Văn hóa & di sản', variant: 'heritage' },
+      nature: { style: 'Biển & thiên nhiên', variant: 'nature' },
+      food: { style: 'Ẩm thực đường phố', variant: 'food' },
+    };
+    document.querySelectorAll('.quick-action[data-style]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cfg = styleMap[btn.dataset.style];
+        VinTravelState.save({ style: cfg.style, selectedVariant: cfg.variant });
+        window.location.href = 'itineraries.html';
+      });
+    });
+    document.getElementById('new-trip-btn').addEventListener('click', () => {
+      window.location.href = 'plan-trip.html';
+    });
+  </script>
+</body>
+</html>

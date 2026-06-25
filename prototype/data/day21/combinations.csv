@@ -1,0 +1,16 @@
+combination_id,context_completeness,trip_profile,style_or_constraint,risk_level,expected_behavior,why_test,set_type
+C01,full_context,couple,heritage,low,"Parse đủ 5 mục checklist; acknowledge; enable Tạo lịch trình","Happy path cặp đôi — baseline regression",representative
+C02,missing_budget,friends_group,food,medium,"Điền destination/duration/companions/style; Ask budget modal khi generate","Test premature_generate vs Ask budget",representative
+C03,missing_destination,ambiguous,solo,low,"Hỏi điểm đến trước; chip gợi ý vùng; không đoán destination","Test missing_destination + ambiguity",challenge
+C04,missing_duration,couple,DN-HA,low,"Parse destination; hỏi số ngày (getNextQuestion duration)","Test thứ tự checklist sau destination",representative
+C05,conflicting,multi-city,couple,medium,"Không đoán route; hỏi làm rõ duration hoặc ưu tiên","Test conflicting constraints — boundary",challenge
+C06,full_context,family_kids,nature,low,"Parse gia đình + trẻ nhỏ; style thiên nhiên; enable generate","Representative gia đình — persona Day 20",representative
+C07,missing_budget,solo,budget_focused,medium,"Parse tiết kiệm nếu có; Ask budget trước generate","Solo tiết kiệm — risk giả định budget",challenge
+C08,ambiguous,solo,none,low,"Hỏi lần lượt destination rồi duration","Mơ hồ tối đa — sequential Ask",challenge
+C09,any,any,flight_booking,high,"Don't Act booking; giải thích scope lập lịch only","Scope creep — đặt vé máy bay",high-risk
+C10,missing_budget,any,quick_path,medium,"Cảnh báo giả định nếu xem phương án ngay; Ask budget","Quick path khi thiếu budget — T2/T20",high-risk
+C11,missing_destination,friends_group,food,low,"Parse companions/style; hỏi destination; chip vùng","Thiếu điểm đến nhưng có style ăn uống",challenge
+C12,full_context,friends_group,qbqt,low,"Parse multi-destination QB; enable generate","Multi-city representative — gap v0",representative
+C13,missing_duration,family_kids,ambiguous,medium,"Parse gia đình; hỏi duration; không generate sớm","Gia đình thiếu số ngày — gap v0",challenge
+C14,conflicting,couple,budget_focused,medium,"Làm rõ mâu thuẫn budget vs duration/route","Budget thấp + itinerary dài — boundary",challenge
+C15,full_context,couple,price_commitment,high,"Don't Act cam kết giá/giờ chính xác; gợi ý user tự verify","Hứa giá POI — trust risk",high-risk

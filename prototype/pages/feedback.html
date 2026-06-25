@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback 2×2 — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="rationale.html">Rationale</a>
+      <a href="../report.html">Báo cáo</a>
+    </nav>
+  </div>
+
+  <div class="page-content">
+    <p style="margin-bottom:1rem;"><a href="review.html">← Quay lại chuyến đi</a> · <a href="../report.html">Báo cáo Day 18</a></p>
+    <div class="page-header">
+      <h1>05 — Ma trận Feedback 2×2</h1>
+      <p style="color:var(--color-gray-600);">User/System × Explicit/Implicit — mỗi ô có rationale trong prototype.</p>
+    </div>
+
+    <div class="feedback-matrix">
+      <div class="feedback-cell header"></div>
+      <div class="feedback-cell header">Explicit — Tường minh</div>
+      <div class="feedback-cell header">Implicit — Ngầm định</div>
+
+      <div class="feedback-cell row-header">User → System</div>
+      <div class="feedback-cell has-rationale">
+        <strong>Báo thông tin sai</strong> + chọn lý do (giờ mở cửa / quá dày)<br><br>
+        <strong>Chỉnh sửa</strong> hoạt động trực tiếp<br><br>
+        <strong>Từ chối</strong> đề xuất thay thế<br><br>
+        <small>→ <a href="review.html#t7">review.html#t7</a></small>
+        <div class="rationale-card">
+          <h4>Khi nào?</h4>
+          <p>Sau khi xem POI hoặc ngày quá tải. Giúp hệ thống hiểu loại lỗi — không chỉ "không thích".</p>
+        </div>
+      </div>
+      <div class="feedback-cell has-rationale">
+        <strong>Hoàn tác</strong> (Undo)<br><br>
+        <strong>Bỏ dở</strong> wizard checklist<br><br>
+        <strong>Thời gian xem lại</strong> &gt;30s trên explainability<br><br>
+        <small>Chú thích: hành vi ≠ ý định</small>
+        <div class="rationale-card">
+          <h4>Ý nghĩa khác?</h4>
+          <p>Undo có thể do đổi ý, không nhất thiết AI sai. Không tự coi là nhãn đúng/sai.</p>
+        </div>
+      </div>
+
+      <div class="feedback-cell row-header">System → User</div>
+      <div class="feedback-cell has-rationale">
+        Progress <strong>3/5</strong><br><br>
+        Banner <strong>"Đang tạo lịch trình…"</strong><br><br>
+        Badge <strong>độ tin cậy</strong> + ngày cập nhật<br><br>
+        Xác nhận recovery: <em>"Đã bỏ 2 điểm"</em><br><br>
+        <small>→ <a href="plan-trip.html">plan-trip.html</a></small>
+        <div class="rationale-card">
+          <h4>Mục tiêu</h4>
+          <p>Dẫn đường rõ — user biết AI đang làm gì và bước tiếp theo.</p>
+        </div>
+      </div>
+      <div class="feedback-cell has-rationale">
+        Checklist item <strong>mờ</strong> khi thiếu<br><br>
+        Nút Generate <strong>disabled</strong><br><br>
+        Style <strong>Nháp</strong> vs <strong>Đã chốt</strong><br><br>
+        Icon <strong>⚠</strong> trên ngày quá tải<br><br>
+        <small>→ affordance giao diện</small>
+        <div class="rationale-card">
+          <h4>Vì sao implicit?</h4>
+          <p>Cue ngầm trước khi ngắt lời bằng hướng dẫn trực tiếp — progressive disclosure.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:2rem;">
+      <h3 style="margin-bottom:0.75rem;">Nguyên tắc thiết kế feedback</h3>
+      <ul style="padding-left:1.25rem;font-size:0.9rem;">
+        <li>Phản hồi dễ thực hiện, đúng ngữ cảnh</li>
+        <li>Nói rõ feedback được dùng như thế nào</li>
+        <li>Đặt tại điểm dừng tự nhiên — không gián đoạn liên tục</li>
+        <li>Người dùng kiểm soát việc sử dụng tín hiệu ngầm</li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="../assets/js/annotations.js"></script>
+  <script>VinTravelAnnotations.init();</script>
+</body>
+</html>

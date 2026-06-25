@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracking Spec — VinTravel Day 20</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <style>
+    .track-wrap { max-width: 960px; margin: 0 auto; padding: 2rem; }
+    .track-wrap h1 { font-size: 1.75rem; color: var(--color-indigo); margin-bottom: 0.5rem; }
+    .track-wrap table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 1rem 0; }
+    .track-wrap th, .track-wrap td { padding: 0.5rem 0.6rem; border: 1px solid var(--color-gray-200); text-align: left; vertical-align: top; }
+    .track-wrap th { background: var(--color-gray-100); }
+    .event-pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-family: monospace;
+      background: #f0f7f4;
+      border: 1px solid var(--color-bamboo);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      margin: 0.1rem;
+    }
+    .flow-map { display: grid; gap: 0.5rem; margin: 1.25rem 0; }
+    .flow-map-step {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.65rem 0.85rem;
+      background: white;
+      border: 1px solid var(--color-gray-200);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+    }
+    .event-log {
+      max-height: 220px;
+      overflow-y: auto;
+      font-size: 0.75rem;
+      font-family: monospace;
+      background: #1a1a2e;
+      color: #a8e6cf;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      margin-top: 0.75rem;
+    }
+    .event-log:empty::before { content: 'Chưa có event — hãy chạy luồng prototype.'; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="../report-day20.html">Báo cáo Day 20</a>
+      <a href="../index.html">Prototype</a>
+    </nav>
+  </div>
+
+  <div class="track-wrap">
+    <h1>Metric Tracking — Event Map</h1>
+    <p style="color:var(--color-gray-600);margin-bottom:1.5rem;">
+      Day 20 lab — events mock ghi vào <code>sessionStorage</code>. Chạy luồng sản phẩm để thấy log bên dưới.
+    </p>
+
+    <div class="card" style="margin-bottom:1.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+        <strong>Live event log (session)</strong>
+        <button class="btn btn-ghost btn-sm" id="clear-log" type="button">Xóa log</button>
+      </div>
+      <div class="event-log" id="event-log"></div>
+    </div>
+
+    <h2 style="font-size:1.15rem;color:var(--color-indigo);">Flow → Events</h2>
+    <div class="flow-map">
+      <div class="flow-map-step">
+        <span><a href="../index.html">Landing</a></span>
+        <span class="event-pill">landing_viewed</span>
+      </div>
+      <div class="flow-map-step">
+        <span><a href="onboarding.html">Onboarding (1 bước)</a></span>
+        <span><span class="event-pill">onboarding_started</span> <span class="event-pill">destination_set</span></span>
+      </div>
+      <div class="flow-map-step">
+        <span><a href="plan-trip.html">Lập kế hoạch</a> · checklist / quick path</span>
+        <span><span class="event-pill">plan_trip_viewed</span> <span class="event-pill">checklist_step_completed</span> <span class="event-pill">itineraries_generated</span></span>
+      </div>
+      <div class="flow-map-step">
+        <span><a href="itineraries.html">Chọn phương án</a></span>
+        <span class="event-pill">itinerary_variant_selected</span>
+      </div>
+      <div class="flow-map-step">
+        <span><a href="review.html">Review</a> — <strong>core action + activation</strong></span>
+        <span><span class="event-pill">itinerary_review_viewed</span> <span class="event-pill">recovery_*</span> <span class="event-pill">itinerary_confirmed</span></span>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.15rem;color:var(--color-indigo);margin-top:2rem;">Bảng event</h2>
+    <table>
+      <thead>
+        <tr><th>Event</th><th>Ghi khi nào</th><th>Properties</th><th>Metric</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>landing_viewed</code></td><td>Load index</td><td>page</td><td>Funnel</td></tr>
+        <tr><td><code>onboarding_started</code></td><td>Vào onboarding</td><td>entry_point</td><td>Funnel</td></tr>
+        <tr><td><code>destination_set</code></td><td>Xác nhận điểm đến</td><td>region, source</td><td>TTFCC</td></tr>
+        <tr><td><code>plan_trip_viewed</code></td><td>Load plan-trip</td><td>has_destination</td><td>Funnel</td></tr>
+        <tr><td><code>checklist_step_completed</code></td><td>Hoàn thành 1 mục checklist</td><td>step_name</td><td>Drop-off</td></tr>
+        <tr><td><code>itineraries_generated</code></td><td>Hiện / đi tới 4 phương án</td><td>variant_count, path</td><td>Activation funnel</td></tr>
+        <tr><td><code>itinerary_variant_selected</code></td><td>Chọn variant + CTA</td><td>variant_id</td><td>Core action</td></tr>
+        <tr><td><code>itinerary_review_viewed</code></td><td>Review render (1 lần/session)</td><td>variant_id, day_count</td><td>Core action, Activation</td></tr>
+        <tr><td><code>itinerary_confirmed</code></td><td>Bấm Chốt lịch</td><td>variant_id</td><td>NSM</td></tr>
+        <tr><td><code>recovery_started</code></td><td>Mở modal T6</td><td>type</td><td>Recovery</td></tr>
+        <tr><td><code>recovery_completed</code></td><td>Áp dụng chỉnh lịch</td><td>type, removed_count</td><td>Recovery, trade-off</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="font-size:1.15rem;color:var(--color-indigo);margin-top:2rem;">Bảng metric</h2>
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Công thức</th><th>Window</th><th>Segment</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Activation Rate</td><td>users(review_viewed in 24h) / visitors</td><td>24h cohort</td><td>Planning persona</td></tr>
+        <tr><td>Time to First Core Action</td><td>ts(review_viewed) − ts(landing_viewed)</td><td>Per session</td><td>All planners</td></tr>
+        <tr><td>Weekly planning retention</td><td>return_to_review in 7d / core_action_users</td><td>7 ngày</td><td>Active planners</td></tr>
+        <tr><td>Confirmed itinerary rate</td><td>confirmed / review_viewed</td><td>Monthly</td><td>Activated users</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:1.5rem;font-size:0.85rem;">
+      <a href="../index.html" class="btn btn-primary btn-sm">Chạy luồng → xem log</a>
+      <a href="../report-day20.html" style="margin-left:0.5rem;">← Báo cáo Day 20</a>
+    </p>
+  </div>
+
+  <script src="../assets/js/tracking-mock.js"></script>
+  <script>
+    const logEl = document.getElementById('event-log');
+
+    function renderLog() {
+      const events = VinTravelTrack.all();
+      logEl.innerHTML = events.length
+        ? events.map((e) => `${e.ts}  ${e.event}  ${JSON.stringify(e.properties)}`).join('\n')
+        : '';
+    }
+
+    document.getElementById('clear-log').addEventListener('click', () => {
+      VinTravelTrack.clear();
+      renderLog();
+    });
+
+    document.addEventListener('vintravel:track', renderLog);
+    renderLog();
+  </script>
+</body>
+</html>

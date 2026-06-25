@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lịch trình — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="has-bottom-nav">
+  <div id="app-shell" class="app-shell no-discovery">
+    <main class="app-main" data-main>
+      <div class="page-content">
+        <nav class="flow-stepper" id="trip-stepper" aria-label="Tiến trình chuyến đi"></nav>
+        <div id="value-banner" class="value-evidence-banner" style="display:none;margin-bottom:1rem;padding:0.85rem 1.1rem;background:linear-gradient(135deg,#f0f7f4,#fff9e6);border:1px solid var(--color-bamboo);border-radius:var(--radius-md);">
+          <p style="font-size:0.92rem;margin:0 0 0.35rem;"><strong>Đây là lịch nháp của bạn</strong> — có thể chỉnh từng ngày, hoàn tác, hoặc chốt khi sẵn sàng.</p>
+          <p id="trip-readiness" style="font-size:0.8rem;color:var(--color-gray-600);margin:0;">Tiến độ chuẩn bị chuyến đi: đang tính…</p>
+        </div>
+        <div id="nurture-banner" class="nurture-banner" style="display:none;margin-bottom:1rem;padding:0.75rem 1rem;background:#fff;border:1px dashed var(--color-gold);border-radius:var(--radius-sm);font-size:0.85rem;">
+          <span id="nurture-text"></span>
+        </div>
+        <div class="page-header">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+            <div>
+              <span class="badge badge-draft" id="status-badge">Bản nháp</span>
+              <h1 style="margin-top:0.5rem;" id="trip-title">Chuyến đi của bạn</h1>
+              <p style="color:var(--color-gray-600);" id="trip-meta">Đang cập nhật thông tin chuyến đi</p>
+            </div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-secondary btn-sm" id="undo-btn" type="button" disabled>↩ Hoàn tác</button>
+              <button class="btn btn-primary btn-sm" id="confirm-btn" type="button">Chốt lịch trình</button>
+              <a href="booking.html" class="btn btn-secondary btn-sm" id="book-btn" style="pointer-events:none;opacity:0.5;" aria-disabled="true">Đặt phòng</a>
+            </div>
+          </div>
+          <p style="margin-top:0.75rem;"><a href="itineraries.html" style="font-size:0.85rem;">← Chọn phương án khác</a></p>
+        </div>
+
+        <section class="card" id="poi-section" style="margin-bottom:2rem;">
+          <h2 style="font-size:1.1rem;margin-bottom:1rem;" id="poi-section-title">Gợi ý ăn uống</h2>
+          <div class="poi-gallery">
+            <div class="poi-gallery-main" id="poi-gallery-main"></div>
+            <div class="poi-gallery-thumbs">
+              <div style="background:url('https://images.unsplash.com/photo-1604908176997-43162e0bc0e0?w=300') center/cover;"></div>
+              <div style="background:url('https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=300') center/cover;"></div>
+            </div>
+          </div>
+          <h3 id="poi-name" style="font-size:1.15rem;"></h3>
+          <p style="font-size:0.85rem;color:var(--color-gray-600);margin:0.25rem 0 1rem;" id="poi-rating-line"></p>
+          <p style="font-size:0.9rem;margin-bottom:1rem;" id="poi-desc"></p>
+          <div class="poi-info-blocks">
+            <div class="poi-info-block">
+              <div class="label">Địa chỉ</div>
+              <div id="poi-address"></div>
+            </div>
+            <div class="poi-info-block" id="hours-block">
+              <div class="label">Giờ mở cửa</div>
+              <div id="poi-hours"></div>
+              <span class="badge badge-confirmed" id="hours-badge">Có thể đang mở</span>
+              <button class="btn btn-ghost btn-sm" id="show-source" type="button" style="margin-top:0.5rem;padding:0;font-size:0.8rem;">Nguồn thông tin</button>
+              <div class="evidence-panel" id="evidence-panel" style="display:none;margin-top:0.75rem;">
+                Nguồn: Google Maps · Cập nhật 03/2025<br>
+                Thông tin giờ mở cửa có thể thay đổi — nên gọi điện hoặc kiểm tra lại trước khi đến.
+              </div>
+            </div>
+            <div class="poi-info-block">
+              <div class="label">Gợi ý</div>
+              <div id="poi-tip">Ăn sáng hoặc trưa trước khi rời điểm đến</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="report-wrong" type="button">Thông tin không chính xác?</button>
+          <div id="report-flow" style="display:none;margin-top:1rem;">
+            <p style="font-size:0.9rem;margin-bottom:0.5rem;">Chuyện gì không đúng?</p>
+            <div class="chips">
+              <button class="chip report-reason" type="button" data-reason="closed">Đã đóng cửa / đổi giờ</button>
+              <button class="chip report-reason" type="button" data-reason="wrong">Địa chỉ hoặc tên sai</button>
+            </div>
+            <div id="alternatives" style="display:none;margin-top:1rem;">
+              <p style="font-size:0.9rem;font-weight:600;margin-bottom:0.5rem;">Chọn quán thay thế gần đó:</p>
+              <div class="chips" id="alt-chips"></div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+            <h2 style="font-size:1.1rem;">Lịch trình theo ngày</h2>
+            <button class="btn btn-secondary btn-sm" id="too-packed-btn" type="button" style="display:none;">Điều chỉnh lịch nhẹ hơn</button>
+          </div>
+          <div id="removed-notice" style="display:none;font-size:0.85rem;color:var(--color-danger);margin-bottom:1rem;"></div>
+          <div id="days-accordion"></div>
+        </section>
+
+        <section class="card review-chat-panel" id="review-chat-panel" aria-label="Chỉnh lịch qua chat">
+          <h2>💬 Chỉnh lịch qua chat</h2>
+          <p style="font-size:0.85rem;color:var(--color-gray-600);">Nhắn để bỏ điểm, làm nhẹ lịch, hoặc đổi phương án — cập nhật ngay bên trên.</p>
+          <div class="loading-banner" id="review-chat-loading" aria-live="polite"><span class="loading-spinner"></span> Đang xử lý…</div>
+          <div class="chat-messages" id="review-chat-messages"></div>
+          <div class="chip-bar">
+            <div class="chips" id="review-chat-chips"></div>
+          </div>
+          <div class="input-box">
+            <input type="text" id="review-chat-input" placeholder="VD: Bỏ Làng gốm, lịch nhẹ hơn, đổi sang ẩm thực…" aria-label="Chỉnh lịch trình">
+            <button class="btn btn-primary btn-sm" id="review-chat-send" type="button">Gửi</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <button type="button" class="review-chat-fab" id="review-chat-fab" aria-label="Mở chat chỉnh lịch">💬</button>
+  <div class="review-chat-overlay" id="review-chat-overlay"></div>
+  <div class="review-chat-drawer" id="review-chat-drawer" role="dialog" aria-label="Chỉnh lịch qua chat">
+    <div class="review-chat-drawer-header">
+      <strong>Chỉnh lịch qua chat</strong>
+      <button type="button" class="btn btn-ghost btn-sm" id="review-chat-close">Đóng</button>
+    </div>
+    <div class="loading-banner" id="review-chat-loading-mobile" aria-live="polite"><span class="loading-spinner"></span> Đang xử lý…</div>
+    <div class="chat-messages" id="review-chat-messages-mobile"></div>
+    <div class="chip-bar"><div class="chips" id="review-chat-chips-mobile"></div></div>
+    <div class="input-box">
+      <input type="text" id="review-chat-input-mobile" placeholder="Bỏ điểm, làm nhẹ lịch…" aria-label="Chỉnh lịch trình">
+      <button class="btn btn-primary btn-sm" id="review-chat-send-mobile" type="button">Gửi</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="recovery-modal">
+    <div class="modal" style="max-width:520px;" role="dialog" aria-labelledby="recovery-title">
+      <h3 id="recovery-title">Điều chỉnh lịch nhẹ hơn</h3>
+      <p id="recovery-msg" style="font-size:0.9rem;color:var(--color-gray-600);">
+        Một ngày trong lịch có khá nhiều điểm và thời gian di chuyển dài. Bạn muốn bỏ hoạt động nào?
+      </p>
+      <div id="removable-list" style="margin:1rem 0;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="recovery-cancel" type="button">Huỷ</button>
+        <button class="btn btn-primary" id="recovery-apply" type="button">Cập nhật lịch trình</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/mock-ai.js"></script>
+  <script src="../assets/js/app-shell.js"></script>
+  <script src="../assets/js/tracking-mock.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    let trip = VinTravelState.load();
+    let coreActionLogged = false;
+    if (!trip.selectedVariant) {
+      trip = VinTravelState.save({ selectedVariant: VinTravelUI.getRecommendedVariantId(trip) });
+    }
+
+    VinTravelAppShell.mount('app-shell', { activePage: 'review', showDiscovery: false });
+    VinTravelUI.renderStepper('review');
+
+    function refreshUI() {
+      trip = VinTravelState.load();
+      VinTravelUI.renderTripHeader(trip);
+      const poi = VinTravelUI.renderPoiSection(trip);
+      VinTravelUI.renderItineraryAccordion('days-accordion', trip);
+      VinTravelUI.updateUndoButton();
+      updateBookingCTA();
+      updateRecoveryButton();
+      showRemovedNotice();
+      updateValueBanners();
+      window._currentPoi = poi;
+      if (!coreActionLogged && trip.selectedVariant) {
+        const days = VinTravelUI.getItineraryDays(trip.selectedVariant, trip);
+        VinTravelTrack.log('itinerary_review_viewed', {
+          variant_id: trip.selectedVariant,
+          day_count: days.length,
+        });
+        coreActionLogged = true;
+      }
+    }
+
+    function updateValueBanners() {
+      const banner = document.getElementById('value-banner');
+      const readiness = document.getElementById('trip-readiness');
+      const nurture = document.getElementById('nurture-banner');
+      const nurtureText = document.getElementById('nurture-text');
+      if (banner) banner.style.display = 'block';
+      const variantId = trip.selectedVariant || 'heritage';
+      const days = VinTravelUI.getItineraryDays(variantId, trip);
+      const totalActs = days.reduce((n, d) => n + d.activities.length, 0);
+      const removed = (trip.removedActivityKeys || []).length;
+      let score = trip.confirmed ? 100 : Math.min(85, 40 + totalActs * 4 - removed * 5);
+      if (readiness) {
+        readiness.textContent = `Tiến độ chuẩn bị: ${score}% — ${trip.confirmed ? 'đã chốt lịch' : 'còn có thể chỉnh trước khi đặt phòng'}.`;
+      }
+      if (nurture && nurtureText) {
+        nurture.style.display = trip.confirmed ? 'none' : 'block';
+        nurtureText.innerHTML = '<strong>Nurture (Day 20):</strong> Còn ~14 ngày tới chuyến đi — hoàn thiện 1 việc nhỏ hôm nay (vd. bỏ 1 điểm quá dày) để lịch nhẹ hơn.';
+      }
+    }
+
+    function updateBookingCTA() {
+      const bookBtn = document.getElementById('book-btn');
+      const confirmBtn = document.getElementById('confirm-btn');
+      if (trip.confirmed) {
+        bookBtn.style.pointerEvents = '';
+        bookBtn.style.opacity = '1';
+        bookBtn.removeAttribute('aria-disabled');
+        confirmBtn.textContent = 'Đã chốt ✓';
+        confirmBtn.disabled = true;
+      } else {
+        bookBtn.style.pointerEvents = 'none';
+        bookBtn.style.opacity = '0.5';
+        bookBtn.setAttribute('aria-disabled', 'true');
+        confirmBtn.textContent = 'Chốt lịch trình';
+        confirmBtn.disabled = false;
+      }
+    }
+
+    function updateRecoveryButton() {
+      const variantId = trip.selectedVariant || 'heritage';
+      const days = VinTravelUI.getItineraryDays(variantId, trip);
+      const hasOverload = days.some((d) => d.overloaded) && !trip.recoveryApplied;
+      document.getElementById('too-packed-btn').style.display = hasOverload ? '' : 'none';
+    }
+
+    function showRemovedNotice() {
+      const keys = trip.removedActivityKeys || [];
+      const notice = document.getElementById('removed-notice');
+      if (keys.length) {
+        notice.style.display = 'block';
+        notice.textContent = `Đã bỏ ${keys.length} hoạt động — các mục bị gạch hiển thị bên dưới cho đến khi bạn hoàn tác.`;
+      } else {
+        notice.style.display = 'none';
+      }
+    }
+
+    document.getElementById('confirm-btn').addEventListener('click', () => {
+      VinTravelState.save({ confirmed: true });
+      VinTravelTrack.log('itinerary_confirmed', { variant_id: trip.selectedVariant });
+      refreshUI();
+      VinTravelUI.showToast('Đã chốt lịch trình — bạn có thể tiếp tục đặt phòng.');
+    });
+
+    document.getElementById('show-source').addEventListener('click', () => {
+      const panel = document.getElementById('evidence-panel');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.getElementById('report-wrong').addEventListener('click', () => {
+      document.getElementById('report-flow').style.display = 'block';
+    });
+
+    document.querySelectorAll('.report-reason').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const poi = window._currentPoi;
+        document.getElementById('hours-badge').textContent = 'Cần xác minh';
+        document.getElementById('hours-badge').className = 'badge badge-warning';
+        document.getElementById('alternatives').style.display = 'block';
+        const chips = document.getElementById('alt-chips');
+        chips.innerHTML = (poi.alternatives || []).map((a) =>
+          `<button class="chip alt-chip" type="button" data-name="${a.name}">${a.name}</button>`
+        ).join('');
+        chips.querySelectorAll('.alt-chip').forEach((c) => {
+          c.addEventListener('click', () => {
+            VinTravelState.pushHistory('Báo POI sai');
+            VinTravelState.save({
+              poiReported: true,
+              customPoi: { ...poi, name: c.dataset.name, hours: '07:00 – 21:00 (ước tính)' },
+            });
+            refreshUI();
+            document.getElementById('hours-badge').textContent = 'Đã cập nhật';
+            document.getElementById('hours-badge').className = 'badge badge-confirmed';
+            VinTravelUI.showToast('Đã thay thế gợi ý ăn uống trong lịch trình.');
+          });
+        });
+      });
+    });
+
+    function openRecovery() {
+      VinTravelTrack.log('recovery_started', { type: 'schedule_overload' });
+      const variantId = trip.selectedVariant || 'heritage';
+      const removable = VinTravelUI.getRemovableForVariant(variantId);
+      document.getElementById('removable-list').innerHTML = removable.map((r) => `
+        <label style="display:flex;gap:0.5rem;margin:0.5rem 0;font-size:0.9rem;cursor:pointer;">
+          <input type="checkbox" value="${r.id}" data-day="${r.day}" data-name="${r.name}" checked>
+          <span><strong>${r.name}</strong> — ${r.reason}</span>
+        </label>`).join('');
+      document.getElementById('recovery-modal').classList.add('open');
+    }
+
+    document.getElementById('too-packed-btn').addEventListener('click', openRecovery);
+    document.getElementById('recovery-cancel').addEventListener('click', () => {
+      document.getElementById('recovery-modal').classList.remove('open');
+    });
+
+    document.getElementById('recovery-apply').addEventListener('click', () => {
+      VinTravelState.pushHistory('Điều chỉnh lịch');
+      const checked = [...document.querySelectorAll('#removable-list input:checked')];
+      const newKeys = checked.map((cb) => VinTravelUI.activityKey(parseInt(cb.dataset.day, 10), cb.dataset.name));
+      const prevKeys = trip.removedActivityKeys || [];
+      VinTravelState.save({
+        recoveryApplied: true,
+        removedActivityKeys: [...new Set([...prevKeys, ...newKeys])],
+      });
+      document.getElementById('recovery-modal').classList.remove('open');
+      refreshUI();
+      VinTravelTrack.log('recovery_completed', { type: 'schedule_overload', removed_count: newKeys.length });
+      VinTravelUI.showToast(`Đã rút gọn lịch trình — bỏ ${newKeys.length} hoạt động. Bạn có thể hoàn tác.`);
+    });
+
+    document.getElementById('undo-btn').addEventListener('click', () => {
+      const restored = VinTravelState.undo();
+      if (restored) {
+        refreshUI();
+        VinTravelUI.showToast('Đã hoàn tác lần sửa gần nhất.');
+      }
+    });
+
+    refreshUI();
+    if (location.hash === '#t6') openRecovery();
+    if (location.hash === '#t7') document.getElementById('report-wrong').click();
+
+    VinTravelUI.mountItineraryChat({ onUpdate: () => refreshUI() });
+
+    const drawer = document.getElementById('review-chat-drawer');
+    const overlay = document.getElementById('review-chat-overlay');
+    const openDrawer = () => {
+      drawer.classList.add('open');
+      overlay.classList.add('open');
+      document.getElementById('review-chat-input-mobile')?.focus();
+    };
+    const closeDrawer = () => {
+      drawer.classList.remove('open');
+      overlay.classList.remove('open');
+    };
+    document.getElementById('review-chat-fab')?.addEventListener('click', openDrawer);
+    document.getElementById('review-chat-close')?.addEventListener('click', closeDrawer);
+    overlay?.addEventListener('click', closeDrawer);
+
+    VinTravelUI.mountItineraryChat({
+      messagesId: 'review-chat-messages-mobile',
+      chipsId: 'review-chat-chips-mobile',
+      inputId: 'review-chat-input-mobile',
+      sendId: 'review-chat-send-mobile',
+      loadingId: 'review-chat-loading-mobile',
+      onUpdate: (t) => { refreshUI(); },
+    });
+  </script>
+</body>
+</html>

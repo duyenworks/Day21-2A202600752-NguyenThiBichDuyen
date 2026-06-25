@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lập kế hoạch — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="has-bottom-nav">
+  <div class="wizard-layout">
+    <div class="wizard-chat">
+      <div class="top-bar" style="padding:0 0 1rem;border:none;background:transparent;">
+        <a href="../index.html" class="logo" style="text-decoration:none;font-size:1.25rem;">Vin<span>Travel</span></a>
+      </div>
+      <nav class="flow-stepper" id="trip-stepper" aria-label="Tiến trình chuyến đi"></nav>
+      <h2 style="font-size:1.75rem;margin-bottom:1rem;">Lên kế hoạch chuyến đi</h2>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="loading-banner" id="loading" aria-live="polite"><span class="loading-spinner"></span> Đang xử lý…</div>
+      <div class="chip-bar" id="chip-bar">
+        <div class="chips" id="reply-chips"></div>
+      </div>
+      <div class="input-box">
+        <input type="text" id="chat-input" placeholder="Trả lời hoặc bổ sung thêm…" aria-label="Tin nhắn">
+        <button class="btn btn-primary btn-sm" id="send-btn">Gửi</button>
+      </div>
+      <p class="disclaimer">VinTravel gợi ý lịch trình — vui lòng kiểm tra giờ mở cửa và giá trước khi đi.</p>
+    </div>
+
+    <aside class="wizard-sidebar">
+      <div class="progress-ring" id="progress-ring">0/5</div>
+      <p style="font-size:0.85rem;margin-bottom:1rem;">Thông tin chuyến đi</p>
+      <div id="checklist"></div>
+      <div id="quick-path-card" class="card" style="display:none;margin-bottom:1rem;padding:0.85rem 1rem;background:#f0f7f4;border-color:var(--color-bamboo);">
+        <p style="font-size:0.85rem;margin-bottom:0.65rem;"><strong>Đã có điểm đến?</strong> Xem ngay 4 phương án lịch trình — chi tiết ngân sách có thể bổ sung sau.</p>
+        <button class="btn btn-secondary btn-sm" id="quick-variants-btn" type="button" style="width:100%;">Xem phương án ngay →</button>
+      </div>
+      <button class="btn btn-primary" id="generate-btn" style="width:100%;margin-top:auto;" disabled>
+        ✨ Tạo lịch trình
+      </button>
+      <p style="font-size:0.75rem;margin-top:0.75rem;opacity:0.85;">
+        VinTravel tạo lịch trình khi đủ thông tin cơ bản — hoặc dùng mặc định bên dưới.
+      </p>
+      <button class="btn btn-ghost btn-sm" id="skip-btn" style="margin-top:0.5rem;width:100%;">Dùng gợi ý mặc định</button>
+    </aside>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Điều hướng chính">
+    <a href="../index.html" class="bottom-nav-item"><span class="bottom-nav-icon">🏠</span><span>Trang chủ</span></a>
+    <a href="plan-trip.html" class="bottom-nav-item active"><span class="bottom-nav-icon">✨</span><span>Lập kế hoạch</span></a>
+    <a href="itineraries.html" class="bottom-nav-item"><span class="bottom-nav-icon">🧭</span><span>Lịch trình</span></a>
+    <button type="button" class="bottom-nav-item" id="bottom-account"><span class="bottom-nav-icon">👤</span><span>Tài khoản</span></button>
+  </nav>
+
+  <div class="modal-overlay" id="budget-modal">
+    <div class="modal" role="dialog" aria-labelledby="budget-title">
+      <h3 id="budget-title">Xác nhận ngân sách</h3>
+      <p>Bạn chưa chọn mức chi tiêu. Mình sẽ gợi ý trong khoảng <strong>~3 triệu/ngày</strong> (ăn uống & tham quan, chưa gồm khách sạn). Tiếp tục?</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="budget-cancel">Để tôi chọn</button>
+        <button class="btn btn-primary" id="budget-ok">Tiếp tục</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/mock-ai.js"></script>
+  <script src="../assets/js/tracking-mock.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    VinTravelUI.renderStepper('plan');
+    VinTravelTrack.log('plan_trip_viewed', { has_destination: !!VinTravelState.load().destination });
+
+    function buildInitialChat() {
+      const trip = VinTravelState.load();
+      const dest = trip.destination || 'Việt Nam';
+      const msgs = document.getElementById('chat-messages');
+      let intro = '';
+      if (trip.destination) {
+        intro = `<div class="message user">Tôi muốn đi ${trip.destination}</div>
+          <div class="message ai">
+            <div class="ai-label">VinTravel</div>
+            <p>${trip.destination} — mình đã ghi nhận điểm đến. Hãy bổ sung thêm vài chi tiết bên dưới.</p>
+          </div>`;
+      } else {
+        intro = `<div class="message ai">
+            <div class="ai-label">VinTravel</div>
+            <p>Chào bạn! Bạn muốn đi đâu ở Việt Nam? Có thể gợi ý một vùng hoặc vài thành phố.</p>
+          </div>`;
+      }
+      msgs.innerHTML = intro;
+      updateChips();
+      VinTravelUI.scrollChatToBottom();
+    }
+
+    function renderChecklist() {
+      const items = VinTravelState.getChecklistItems();
+      const filled = VinTravelState.countFilled();
+      document.getElementById('progress-ring').textContent = `${filled}/5`;
+      document.getElementById('checklist').innerHTML = items.map((item) => `
+        <div class="checklist-item ${item.value ? 'done' : 'pending'}">
+          <span class="check-icon">${item.value ? '✓' : '○'}</span>
+          <div>
+            <div class="check-label">${item.label}</div>
+            <div class="check-value">${item.value || item.hint}</div>
+          </div>
+        </div>`).join('');
+      document.getElementById('generate-btn').disabled = filled < 3;
+      const trip = VinTravelState.load();
+      const quickCard = document.getElementById('quick-path-card');
+      if (quickCard) quickCard.style.display = trip.destination ? 'block' : 'none';
+    }
+
+    function updateChips() {
+      const s = VinTravelState.load();
+      const q = VinTravelAI.getNextQuestion(s);
+      const chipsEl = document.getElementById('reply-chips');
+      const bar = document.getElementById('chip-bar');
+      if (!q) {
+        chipsEl.innerHTML = '';
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'block';
+      VinTravelUI.renderChips(chipsEl, q.chips, handleUserMessage);
+    }
+
+    async function handleUserMessage(text) {
+      const loading = document.getElementById('loading');
+      const msgs = document.getElementById('chat-messages');
+      msgs.innerHTML += `<div class="message user">${text}</div>`;
+      VinTravelUI.scrollChatToBottom();
+      loading.classList.add('visible');
+      await VinTravelAI.simulate();
+      loading.classList.remove('visible');
+
+      const before = VinTravelState.load();
+      const updates = VinTravelAI.parseUserInput(text);
+      VinTravelState.save(updates);
+      const after = VinTravelState.load();
+      Object.keys(updates).forEach((key) => {
+        if (updates[key] && updates[key] !== before[key]) {
+          VinTravelTrack.log('checklist_step_completed', { step_name: key });
+        }
+      });
+
+      let ack = '';
+      Object.keys(updates).forEach((key) => {
+        if (updates[key] && updates[key] !== before[key]) {
+          ack = VinTravelAI.acknowledgment(key, updates[key]);
+        }
+      });
+      if (!ack) ack = 'Đã ghi nhận.';
+
+      const q = VinTravelAI.getNextQuestion(after);
+      let html = `<div class="message ai"><div class="ai-label">VinTravel</div><p>${ack}</p>`;
+      if (q) html += `<p style="margin-top:0.5rem;">${q.text}</p>`;
+      else html += `<p style="margin-top:0.5rem;">Đủ thông tin rồi — bạn có thể tạo lịch trình.</p>`;
+      html += '</div>';
+      msgs.innerHTML += html;
+      VinTravelUI.scrollChatToBottom();
+
+      renderChecklist();
+      updateChips();
+    }
+
+    document.getElementById('send-btn').addEventListener('click', () => {
+      const input = document.getElementById('chat-input');
+      if (input.value.trim()) {
+        handleUserMessage(input.value.trim());
+        input.value = '';
+      }
+    });
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('send-btn').click();
+    });
+
+    document.getElementById('quick-variants-btn')?.addEventListener('click', () => {
+      VinTravelUI.quickPathToVariants();
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', () => {
+      const trip = VinTravelState.load();
+      VinTravelState.save({
+        destination: trip.destination || 'Đà Nẵng – Hội An',
+        duration: '4 ngày',
+        companions: '2 người (cặp đôi)',
+        budget: '~3 triệu/ngày',
+        style: 'Văn hóa & di sản',
+      });
+      renderChecklist();
+      updateChips();
+      document.getElementById('generate-btn').disabled = false;
+    });
+
+    document.getElementById('generate-btn').addEventListener('click', () => {
+      if (!VinTravelState.load().budget) {
+        document.getElementById('budget-modal').classList.add('open');
+        return;
+      }
+      goGenerate();
+    });
+
+    document.getElementById('budget-ok').addEventListener('click', () => {
+      VinTravelState.save({ budget: '~3 triệu/ngày' });
+      document.getElementById('budget-modal').classList.remove('open');
+      renderChecklist();
+      goGenerate();
+    });
+    document.getElementById('budget-cancel').addEventListener('click', () => {
+      document.getElementById('budget-modal').classList.remove('open');
+    });
+
+    function goGenerate() {
+      const trip = VinTravelState.load();
+      const recommended = VinTravelUI.getRecommendedVariantId(trip);
+      const loading = document.getElementById('loading');
+      loading.classList.add('visible');
+      loading.innerHTML = '<span class="loading-spinner"></span> Đang tạo lịch trình…';
+      setTimeout(() => {
+        VinTravelState.save({
+          checklistProgress: 5,
+          draftItinerary: recommended,
+          selectedVariant: recommended,
+        });
+        VinTravelTrack.log('itineraries_generated', { variant_count: 4, path: 'wizard' });
+        window.location.href = 'itineraries.html';
+      }, 1400);
+    }
+
+    document.getElementById('bottom-account').addEventListener('click', () => {
+      VinTravelUI.showComingSoon('Tài khoản');
+    });
+
+    renderChecklist();
+    buildInitialChat();
+  </script>
+</body>
+</html>

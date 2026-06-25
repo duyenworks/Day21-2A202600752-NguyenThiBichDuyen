@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design Rationale — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="feedback.html">Feedback</a>
+      <a href="../report.html">Báo cáo</a>
+    </nav>
+  </div>
+
+  <div class="page-content">
+    <p style="margin-bottom:1rem;"><a href="review.html">← Quay lại chuyến đi</a> · <a href="../report.html">Báo cáo Day 18</a></p>
+    <div class="page-header">
+      <h1>06 — Design Rationale</h1>
+      <p style="color:var(--color-gray-600);">Trả lời: AI biết gì? Chưa biết gì? Có thể sai ở đâu? Act/Ask/Don't Act?</p>
+    </div>
+
+    <div style="display:grid;gap:1.25rem;">
+      <div class="card">
+        <h3>T0 — Onboarding</h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">AI biết</td><td>Chưa có sở thích, ngân sách, ngày đi</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Giả định</td><td>User đọc disclaimer về giới hạn AI</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Rủi ro</td><td>Tin AI quá mức → kỳ vọng tự đặt vé</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Quyết định</td><td>3 bước ngắn, 1 câu hỏi cuối — không form dài</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>T2 — Hỏi thêm <span class="badge badge-ask">Ask</span></h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">AI biết</td><td>Điểm đến sau câu đầu (Act điền checklist)</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Chưa biết</td><td>Số ngày, ngân sách, phong cách</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Có thể sai</td><td>Giả định ngân sách mặc định 3tr/ngày</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Hậu quả</td><td>Lịch trình lệch nhu cầu thực tế</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Quyết định</td><td>Hỏi từng mục + modal Ask trước generate nếu thiếu budget</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>T4 — Nhiều phương án</h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">Giả định</td><td>Một lịch trình = tối ưu duy nhất</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Quyết định</td><td>4 variant + tiêu chí xếp hạng hiển thị (explainability)</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">QB/QT</td><td>Variant thứ 4: Phong Nha → DMZ → Huế</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>T6 — Lịch trình quá dày</h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">Có thể sai</td><td>AI ưu tiên "nhiều điểm" hơn thời gian nghỉ</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Phát hiện</td><td>Badge ⚠ + nút "Lịch trình quá dày"</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Recovery</td><td>User chọn bỏ điểm → before/after → không lưu cho chuyến sau</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>T7 — Thông tin lỗi thời</h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">Rủi ro</td><td>Đến nhà hàng đóng cửa — chuyến đi bị ảnh hưởng</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Bằng chứng</td><td>Nguồn, ngày cập nhật, độ tin cậy</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Agency</td><td>Don't Act xóa — Ask chọn thay thế</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>T9 — Don't Act booking</h3>
+        <table style="width:100%;font-size:0.85rem;margin-top:0.75rem;border-collapse:collapse;">
+          <tr><td style="padding:0.35rem 0;font-weight:600;width:140px;">Rủi ro</td><td>Thanh toán nhầm, charge thẻ — khó hoàn tác</td></tr>
+          <tr><td style="padding:0.35rem 0;font-weight:600;">Quyết định</td><td>AI điền nháp (Act) · Thanh toán disabled (Don't Act) · CTA Booking.com</td></tr>
+        </table>
+      </div>
+
+      <div class="card" style="border-color:var(--color-gold);">
+        <h3>Quyết định then chốt & rủi ro còn lại</h3>
+        <p style="margin-top:0.75rem;font-size:0.9rem;">
+          <strong>Then chốt:</strong> Mọi lịch trình là <span class="badge badge-draft">Nháp</span> — user phải review trước khi hành động có rủi ro (đặt phòng, tin giờ mở cửa).
+        </p>
+        <p style="margin-top:0.75rem;font-size:0.9rem;">
+          <strong>Rủi ro còn lại:</strong> Mock data không phản ánh giá thật; người dùng vẫn có thể bỏ qua "Xem nguồn" và tin badge "Đang mở".
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/annotations.js"></script>
+  <script>VinTravelAnnotations.init();</script>
+</body>
+</html>

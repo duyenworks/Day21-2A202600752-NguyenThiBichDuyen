@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Điều chỉnh lịch trình — VinTravel (Lab)</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="review.html">← Review (sản phẩm)</a>
+      <a href="../report.html">Báo cáo</a>
+    </nav>
+  </div>
+
+  <div class="page-content">
+    <div class="card" style="margin-bottom:1.5rem;background:#fff9e6;border-color:var(--color-gold);">
+      <strong>Phiên bản lab</strong> — Trong sản phẩm, dùng modal "Điều chỉnh lịch nhẹ hơn" trên <a href="review.html">trang Xem lịch trình</a>. Trang này giữ làm tài liệu tham chiếu cho demo giảng viên.
+    </div>
+
+    <div class="page-header">
+      <h1>Điều chỉnh lịch trình</h1>
+      <p style="color:var(--color-gray-600);">Ví dụ xử lý khi lịch quá dày hoặc thông tin địa điểm không còn đúng.</p>
+    </div>
+
+    <!-- T6 -->
+    <section id="t6" style="margin-bottom:3rem;">
+      <h2 style="margin-bottom:1rem;"><span class="badge badge-warning">Ví dụ</span> Lịch trình quá dày</h2>
+      <p style="margin-bottom:1rem;font-size:0.9rem;">Người dùng: <em>"Quá mệt"</em> — Ngày 2 Hội An: 7 điểm, 5.5h di chuyển.</p>
+
+      <div class="recovery-split has-rationale">
+        <div class="recovery-panel before">
+          <h3>Trước</h3>
+          <span class="badge badge-warning">⚠ 6 hoạt động · 5.5h di chuyển</span>
+          <ul style="font-size:0.85rem;margin-top:1rem;padding-left:1.25rem;">
+            <li>07:00 Làng rau Trà Quế</li>
+            <li>09:00 Chùa Cầu</li>
+            <li>10:30 Hội quán Phúc Kiến</li>
+            <li>12:00 Cao lầu Thanh</li>
+            <li>14:00 Làng gốm Thanh Hà</li>
+            <li>16:00 Biển An Bàng</li>
+            <li>18:30 Đèn lồng & phố đi bộ</li>
+          </ul>
+        </div>
+        <div class="recovery-panel after" id="t6-after">
+          <h3>Sau khôi phục</h3>
+          <span class="badge badge-confirmed">4 hoạt động · 2.5h di chuyển</span>
+          <ul style="font-size:0.85rem;margin-top:1rem;padding-left:1.25rem;" id="t6-after-list">
+            <li>07:00 Làng rau Trà Quế</li>
+            <li>09:00 Chùa Cầu</li>
+            <li>10:30 Hội quán Phúc Kiến</li>
+            <li>12:00 Cao lầu Thanh</li>
+            <li style="text-decoration:line-through;opacity:0.5;">14:00 Làng gốm — đã bỏ</li>
+            <li style="text-decoration:line-through;opacity:0.5;">16:00 An Bàng — đã bỏ</li>
+            <li>18:30 Đèn lồng & phố đi bộ</li>
+          </ul>
+        </div>
+        <div class="rationale-card">
+          <h4>Recovery loop (6 bước)</h4>
+          <p>Phát hiện → đề xuất bỏ điểm → user chọn → xác nhận → preview → thông báo không lưu cho chuyến sau.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1.5rem;">
+        <p style="font-weight:600;margin-bottom:0.75rem;">Bước 3 — Chọn điểm muốn bỏ:</p>
+        <div id="t6-checkboxes"></div>
+        <p style="font-size:0.85rem;margin:1rem 0;color:var(--color-bamboo);display:none;" id="t6-confirm">
+          ✓ Đã hiểu: giảm tải buổi chiều
+        </p>
+        <button class="btn btn-primary btn-sm" id="t6-apply">Áp dụng thay đổi</button>
+        <p style="font-size:0.75rem;margin-top:0.75rem;color:var(--color-gray-400);">Đã cập nhật — không lưu cho chuyến sau.</p>
+        <p style="margin-top:1rem;font-size:0.85rem;"><a href="review.html#t6">→ Dùng modal trên Review trong sản phẩm</a></p>
+      </div>
+    </section>
+
+    <!-- T7 -->
+    <section id="t7">
+      <h2 style="margin-bottom:1rem;"><span class="badge badge-warning">Ví dụ</span> Thông tin chưa chính xác</h2>
+      <p style="margin-bottom:1rem;font-size:0.9rem;">POI: <strong>Cơm niêu Hoàng Ty</strong> — giờ mở cửa có thể đã thay đổi.</p>
+
+      <div class="card has-rationale">
+        <div class="poi-info-blocks">
+          <div class="poi-info-block" id="t7-hours">
+            <div class="label">Giờ mở cửa</div>
+            <div>10:00 – 21:00</div>
+            <span class="badge badge-confirmed" id="t7-badge">Đang mở</span>
+          </div>
+          <div class="poi-info-block">
+            <div class="label">Nguồn</div>
+            <button class="btn btn-ghost btn-sm" id="t7-evidence-btn">Xem bằng chứng</button>
+          </div>
+        </div>
+        <div class="evidence-panel" id="t7-evidence" style="display:none;">
+          <strong>Nguồn:</strong> Google Maps · TripAdvisor<br>
+          <strong>Cập nhật:</strong> 08/2024<br>
+          <strong>Độ tin cậy:</strong> Thấp — nếu tin hoàn toàn, chuyến đi có thể bị ảnh hưởng.
+        </div>
+        <button class="btn btn-secondary btn-sm" style="margin-top:1rem;" id="t7-report">Báo thông tin sai</button>
+        <div id="t7-flow" style="display:none;margin-top:1rem;">
+          <p>Chọn lý do <span class="badge badge-dont-act">AI Don't Act tự xóa</span>:</p>
+          <button class="btn btn-secondary btn-sm" id="t7-reason">Đã đóng cửa / đổi giờ</button>
+          <div id="t7-alts" style="display:none;margin-top:1rem;">
+            <p>Chọn thay thế <span class="badge badge-ask">Ask</span>:</p>
+            <div class="chips">
+              <button class="chip" data-alt="Cơm Niêu 3 Cá Bống">Cơm Niêu 3 Cá Bống</button>
+              <button class="chip" data-alt="Han Cookery">Han Cookery</button>
+            </div>
+          </div>
+        </div>
+        <div class="rationale-card">
+          <h4>Explainability</h4>
+          <p>Lớp bằng chứng giúp user quyết định — không giải thích toàn bộ mô hình AI.</p>
+        </div>
+        <p style="margin-top:1rem;font-size:0.85rem;"><a href="review.html#t7">→ Dùng flow trên Review trong sản phẩm</a></p>
+      </div>
+    </section>
+
+    <div style="margin-top:2rem;">
+      <a href="review.html" class="btn btn-primary">← Quay lại lịch trình</a>
+    </div>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/annotations.js"></script>
+  <script>
+    VinTravelAnnotations.init();
+
+    const list = document.getElementById('t6-checkboxes');
+    MOCK_DATA.overloadedRemovable.forEach((r) => {
+      list.innerHTML += `<label style="display:block;margin:0.5rem 0;font-size:0.9rem;">
+        <input type="checkbox" value="${r.id}" checked> <strong>${r.name}</strong> — ${r.reason}
+      </label>`;
+    });
+
+    document.getElementById('t6-apply').addEventListener('click', () => {
+      document.getElementById('t6-confirm').style.display = 'block';
+      VinTravelState.save({ recoveryApplied: true });
+    });
+
+    document.getElementById('t7-evidence-btn').addEventListener('click', () => {
+      const el = document.getElementById('t7-evidence');
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    });
+    document.getElementById('t7-report').addEventListener('click', () => {
+      document.getElementById('t7-flow').style.display = 'block';
+    });
+    document.getElementById('t7-reason').addEventListener('click', () => {
+      document.getElementById('t7-badge').textContent = 'Cần xác minh';
+      document.getElementById('t7-badge').className = 'badge badge-danger';
+      document.getElementById('t7-alts').style.display = 'block';
+    });
+    document.querySelectorAll('#t7-alts .chip').forEach((c) => {
+      c.addEventListener('click', () => {
+        document.getElementById('t7-badge').textContent = 'Đã thay thế';
+        document.getElementById('t7-badge').className = 'badge badge-confirmed';
+        document.getElementById('t7-hours').querySelector('div:nth-child(2)').textContent = '11:00 – 22:00 (' + c.dataset.alt + ')';
+        VinTravelState.save({ poiReported: true });
+      });
+    });
+
+    if (location.hash === '#t6') document.getElementById('t6').scrollIntoView();
+    if (location.hash === '#t7') document.getElementById('t7').scrollIntoView();
+  </script>
+</body>
+</html>

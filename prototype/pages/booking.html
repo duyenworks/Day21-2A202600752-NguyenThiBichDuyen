@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt phòng — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="has-bottom-nav">
+  <div id="app-shell" class="app-shell no-discovery">
+    <main class="app-main" data-main>
+      <div class="page-content">
+        <nav class="flow-stepper" id="trip-stepper" aria-label="Tiến trình chuyến đi"></nav>
+        <div class="booking-banner" aria-live="polite">
+          ⚠ VinTravel không thanh toán thay bạn — hoàn tất đặt phòng trên trang đối tác.
+        </div>
+
+        <div class="page-header">
+          <h1>Đặt phòng</h1>
+          <p style="color:var(--color-gray-600);margin-top:0.25rem;" id="booking-trip-meta">Xem lại thông tin trước khi chuyển sang trang đặt phòng.</p>
+        </div>
+
+        <div class="stepper" id="stepper">
+          <div class="stepper-step active" data-step="1">Tóm tắt</div>
+          <div class="stepper-step" data-step="2">Thông tin liên hệ</div>
+          <div class="stepper-step disabled" data-step="3">Xác nhận</div>
+        </div>
+
+        <div class="booking-step" id="step-1">
+          <div class="card">
+            <h3 style="margin-bottom:1rem;">Chi tiết đặt phòng</h3>
+            <div id="summary"></div>
+            <button class="btn btn-primary" style="margin-top:1.5rem;" id="to-step-2" type="button">Tiếp tục</button>
+          </div>
+        </div>
+
+        <div class="booking-step" id="step-2" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 280px;gap:1.5rem;">
+            <div class="card form-disabled-overlay">
+              <h3 style="margin-bottom:1rem;">Thông tin thanh toán</h3>
+              <p style="font-size:0.85rem;color:var(--color-gray-600);margin-bottom:1rem;">
+                VinTravel có thể điền sẵn thông tin bạn đã lưu — thanh toán thực hiện trên trang đối tác.
+              </p>
+              <div class="form-group">
+                <label>Số thẻ</label>
+                <input type="text" value="•••• •••• •••• ••••" disabled>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group">
+                  <label>Hết hạn</label>
+                  <input type="text" value="—" disabled>
+                </div>
+                <div class="form-group">
+                  <label>CVV</label>
+                  <input type="text" value="—" disabled>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Họ tên trên thẻ</label>
+                <input type="text" value="NGUYEN VAN A" disabled>
+              </div>
+            </div>
+            <div class="card">
+              <h4 style="margin-bottom:1rem;">Tổng thanh toán</h4>
+              <div id="order-summary"></div>
+            </div>
+          </div>
+          <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
+            <button class="btn btn-secondary" id="back-step-1" type="button">Quay lại</button>
+            <button class="btn btn-primary" disabled title="Thanh toán trên trang đối tác">Thanh toán tại đây</button>
+            <a href="https://www.booking.com" target="_blank" rel="noopener" class="btn btn-primary">Tiếp tục trên Booking.com →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/app-shell.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    const trip = VinTravelState.load();
+    VinTravelAppShell.mount('app-shell', { activePage: 'review', showDiscovery: false });
+    VinTravelUI.renderStepper('booking');
+
+    document.getElementById('booking-trip-meta').textContent =
+      `${VinTravelUI.getTripTitle(trip)} · ${VinTravelUI.formatTripMeta(trip)}`;
+
+    const b = MOCK_DATA.bookingSummary;
+    document.getElementById('summary').innerHTML = `
+      <p><strong>${b.hotel}</strong></p>
+      <p style="font-size:0.9rem;color:var(--color-gray-600);">${b.room}</p>
+      <p style="font-size:0.9rem;margin:0.75rem 0;">Nhận phòng ${b.checkIn} · Trả phòng ${b.checkOut}</p>
+      <p style="font-size:0.9rem;">${b.nights} đêm · ${b.travelers} khách</p>`;
+    document.getElementById('order-summary').innerHTML = `
+      <p style="display:flex;justify-content:space-between;font-size:0.9rem;"><span>Phòng × ${b.nights} đêm</span><span>${b.pricePerNight}</span></p>
+      <p style="display:flex;justify-content:space-between;font-size:0.9rem;"><span>Thuế & phí</span><span>${b.taxes}</span></p>
+      <hr style="margin:0.75rem 0;border:none;border-top:1px solid var(--color-gray-200);">
+      <p style="display:flex;justify-content:space-between;font-weight:700;"><span>Tổng</span><span>${b.total}</span></p>`;
+
+    document.getElementById('to-step-2').addEventListener('click', () => {
+      document.getElementById('step-1').style.display = 'none';
+      document.getElementById('step-2').style.display = 'block';
+      document.querySelectorAll('.stepper-step').forEach((s) => {
+        s.classList.toggle('active', s.dataset.step === '2');
+      });
+    });
+    document.getElementById('back-step-1').addEventListener('click', () => {
+      document.getElementById('step-2').style.display = 'none';
+      document.getElementById('step-1').style.display = 'block';
+      document.querySelectorAll('.stepper-step').forEach((s) => {
+        s.classList.toggle('active', s.dataset.step === '1');
+      });
+    });
+
+    if (location.hash === '#t9') document.getElementById('to-step-2').click();
+  </script>
+</body>
+</html>

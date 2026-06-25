@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chào mừng — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav><a href="../index.html">Trang chủ</a></nav>
+  </div>
+
+  <div class="onboarding-steps">
+    <div class="onboarding-step active" data-step="1">
+      <p style="font-size:0.85rem;color:var(--color-gray-400);margin-bottom:0.5rem;">Bắt đầu nhanh · Day 20</p>
+      <h1 style="font-size:2rem;margin:0 0 0.75rem;">Lên lịch chuyến đi trong vài phút</h1>
+      <p style="color:var(--color-gray-600);margin-bottom:1.25rem;max-width:520px;">
+        VinTravel gợi ý lịch theo ngày — bạn chọn phương án và chỉnh sửa. <strong>Không</strong> tự đặt vé hay thanh toán thay bạn.
+      </p>
+      <div class="card" style="margin-bottom:1.25rem;padding:1rem 1.25rem;">
+        <p style="font-size:0.9rem;margin:0;">Mọi lịch trình là <span class="badge badge-draft">Bản nháp</span> cho đến khi bạn chốt — có thể hoàn tác mọi thay đổi.</p>
+      </div>
+      <h2 style="font-size:1.1rem;margin-bottom:0.75rem;">Bạn muốn đi đâu?</h2>
+      <div class="chips">
+        <button class="chip region-chip" data-region="Đà Nẵng – Hội An">Đà Nẵng – Hội An</button>
+        <button class="chip region-chip" data-region="Quảng Bình – Phong Nha">Quảng Bình</button>
+        <button class="chip region-chip" data-region="Quảng Trị – DMZ">Quảng Trị (DMZ)</button>
+        <button class="chip region-chip" data-region="Huế – Đà Nẵng">Huế – Đà Nẵng</button>
+      </div>
+      <div class="input-box" style="margin-top:1rem;">
+        <input type="text" id="region-input" placeholder="Hoặc nhập điểm đến…">
+      </div>
+      <div style="margin-top:1.5rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-primary" id="finish-onboarding">Bắt đầu lập kế hoạch</button>
+        <button class="btn btn-secondary" id="quick-start">Xem phương án ngay →</button>
+        <a href="../index.html" class="btn btn-ghost btn-sm">Bỏ qua</a>
+      </div>
+      <p style="margin-top:1.25rem;font-size:0.8rem;color:var(--color-gray-400);">
+        Giới thiệu đầy đủ (Day 18): <a href="onboarding-day18.html">3 bước onboarding cũ</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/tracking-mock.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    VinTravelTrack.log('onboarding_started', { entry_point: 'onboarding' });
+
+    document.querySelectorAll('.region-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.getElementById('region-input').value = chip.dataset.region;
+      });
+    });
+
+    const goPlan = (dest, quick = false) => {
+      const region = dest || document.getElementById('region-input').value.trim() || 'Đà Nẵng – Hội An';
+      VinTravelState.save({ destination: region, onboardingDone: true });
+      VinTravelTrack.log('destination_set', { region, source: 'onboarding' });
+      if (quick) {
+        VinTravelUI.quickPathToVariants();
+      } else {
+        window.location.href = 'plan-trip.html';
+      }
+    };
+
+    document.getElementById('finish-onboarding').addEventListener('click', () => {
+      goPlan(document.getElementById('region-input').value.trim());
+    });
+    document.getElementById('quick-start').addEventListener('click', () => {
+      goPlan(document.getElementById('region-input').value.trim(), true);
+    });
+  </script>
+</body>
+</html>

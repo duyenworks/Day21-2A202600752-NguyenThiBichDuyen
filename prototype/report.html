@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Prototype — VinTravel</title>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/report.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="index.html" class="ext-link">Prototype</a>
+      <a href="report-day20.html" class="ext-link">Báo cáo Day 20</a>
+      <a href="report-day21.html" class="ext-link">Báo cáo Day 21</a>
+    </nav>
+  </div>
+
+  <div class="report-wrap">
+    <header class="report-hero">
+      <p class="section-label">Day 18 · AI Travel Planner</p>
+      <h1>VinTravel Prototype</h1>
+      <p class="tagline">Hành trình của bạn. Lên kế hoạch trong vài phút.</p>
+      <p style="font-size:0.95rem;color:var(--color-gray-600);max-width:600px;">
+        Trợ lý AI gợi ý và chỉnh <strong>lịch trình du lịch Việt Nam</strong> — người dùng luôn xem lại, sửa và chốt trước khi đặt phòng. Ứng dụng <strong>không</strong> thanh toán hay đặt vé thay người dùng.
+      </p>
+      <div class="report-hero-meta">
+        <a href="index.html" class="ext-link">Mở prototype</a>
+      </div>
+    </header>
+
+    <nav class="report-toc" aria-label="Mục lục">
+      <h2>Mục lục</h2>
+      <ol>
+        <li><a href="#section-5">Vòng đời người dùng</a></li>
+        <li><a href="#section-6">Giao diện &amp; luồng màn hình</a></li>
+        <li><a href="#section-7">Kịch bản tương tác</a></li>
+        <li><a href="#section-8">Act / Ask / Don't Act</a></li>
+        <li><a href="#section-9">Ma trận Feedback 2×2</a></li>
+        <li><a href="#section-10">Explainability &amp; đánh giá lab</a></li>
+      </ol>
+    </nav>
+
+    <!-- §5 -->
+    <section class="report-section" id="section-5">
+      <div class="report-section-head">
+        <p class="section-label">Phần 1</p>
+        <h2>Vòng đời người dùng</h2>
+      </div>
+      <div class="report-content">
+        <p>Prototype không chỉ là chat — mà là hành trình 4 giai đoạn có điểm dừng rõ:</p>
+        <table>
+          <thead>
+            <tr><th>Giai đoạn</th><th>Mục đích</th><th>Màn hình</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A — Làm quen</strong></td>
+              <td>Giới thiệu AI làm gì / không làm gì</td>
+              <td><a href="pages/onboarding.html" class="ext-link">Onboarding</a></td>
+            </tr>
+            <tr>
+              <td><strong>B — Lập kế hoạch</strong></td>
+              <td>Thu thập thông tin, tạo phương án</td>
+              <td><a href="pages/plan-trip.html" class="ext-link">Lập kế hoạch</a>, <a href="pages/itineraries.html" class="ext-link">Chọn phương án</a></td>
+            </tr>
+            <tr>
+              <td><strong>C — Xem &amp; chốt</strong></td>
+              <td>Chi tiết lịch, chốt bản nháp, đặt phòng</td>
+              <td><a href="pages/review.html" class="ext-link">Xem lịch trình</a>, <a href="pages/booking.html" class="ext-link">Đặt phòng</a></td>
+            </tr>
+            <tr>
+              <td><strong>D — Chỉnh &amp; phục hồi</strong></td>
+              <td>Rút gọn lịch, báo sai POI, hoàn tác</td>
+              <td><a href="pages/review.html" class="ext-link">Review + chat chỉnh lịch</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Luồng chính: <strong>Làm quen → Lập kế hoạch → Chọn phương án → Xem lịch trình → Đặt phòng</strong>. Khi cần sửa, người dùng quay lại giai đoạn D rồi tiếp tục.</p>
+      </div>
+    </section>
+
+    <!-- §6 -->
+    <section class="report-section" id="section-6">
+      <div class="report-section-head">
+        <p class="section-label">Phần 2</p>
+        <h2>Giao diện &amp; luồng màn hình</h2>
+      </div>
+      <div class="report-content">
+        <p>VinTravel dùng <strong>hai kiểu bố cục</strong> phù hợp từng bước:</p>
+        <ul>
+          <li><strong>Wizard chat + checklist</strong> — thu thập thông tin chuyến đi (đi đâu, bao lâu, ngân sách…)</li>
+          <li><strong>App 3 cột</strong> — sidebar điều hướng, nội dung chính, panel gợi ý địa điểm</li>
+        </ul>
+        <p>Phong cách visual hướng văn hóa Việt Nam: tông gạch Hội An, xanh tre, nền kem sen.</p>
+        <table>
+          <thead>
+            <tr><th>Bước</th><th>Màn hình</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Trang chủ</td><td><a href="index.html" class="ext-link">Landing</a></td></tr>
+            <tr><td>Lập kế hoạch</td><td><a href="pages/plan-trip.html" class="ext-link">Chat + checklist</a></td></tr>
+            <tr><td>Chọn phương án</td><td><a href="pages/itineraries.html" class="ext-link">4 lịch trình gợi ý</a></td></tr>
+            <tr><td>Xem lịch trình</td><td><a href="pages/review.html" class="ext-link">POI + lịch theo ngày</a></td></tr>
+            <tr><td>Đặt phòng</td><td><a href="pages/booking.html" class="ext-link">Tóm tắt &amp; chuyển đối tác</a></td></tr>
+            <tr><td>Trợ lý AI</td><td><a href="pages/chat.html" class="ext-link">Khám phá &amp; hỏi đáp</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- §7 -->
+    <section class="report-section report-section--scenarios" id="section-7">
+      <div class="report-section-head">
+        <p class="section-label">Phần 3</p>
+        <h2>Kịch bản tương tác</h2>
+        <p style="font-size:0.9rem;color:var(--color-gray-600);">Sáu kịch bản chính trong prototype.</p>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T0 — Lần đầu dùng app</h3>
+        <p>3 bước ngắn giải thích AI gợi ý lịch trình, không tự đặt vé, và người dùng luôn có quyền sửa / hoàn tác.</p>
+        <a href="pages/onboarding.html" class="ext-link">Mở màn Onboarding →</a>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T2 — AI hỏi thêm <span class="badge badge-ask">Ask</span></h3>
+        <p>Người dùng nói điểm đến → AI điền checklist và hỏi từng mục còn thiếu qua chip gợi ý. Tạo lịch trình chỉ khi đủ thông tin hoặc user xác nhận giả định ngân sách.</p>
+        <a href="pages/plan-trip.html" class="ext-link">Mở màn Lập kế hoạch →</a>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T4 — Nhiều phương án hợp lý</h3>
+        <p>4 hướng lịch trình (Di sản, Biển núi, Ẩm thực, Phong Nha–DMZ–Huế) kèm tiêu chí giải thích. Badge "Phù hợp nhất" gợi ý theo sở thích đã chọn — user tự quyết định.</p>
+        <a href="pages/itineraries.html" class="ext-link">Mở màn Chọn phương án →</a>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T6 — Lịch trình quá dày <span class="badge badge-warning">Recovery</span></h3>
+        <p>Ngày có quá nhiều điểm được cảnh báo. User chọn bỏ hoạt động qua modal hoặc chat ("lịch nhẹ hơn") — lịch cập nhật ngay, có thể hoàn tác.</p>
+        <a href="pages/review.html#t6" class="ext-link">Mở recovery trên Review →</a>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T7 — Thông tin địa điểm lỗi thời</h3>
+        <p>Gợi ý ăn uống hiển thị giờ mở cửa và nguồn tham khảo. User báo sai → chọn quán thay thế — AI không tự xóa mà hỏi lại.</p>
+        <a href="pages/review.html#t7" class="ext-link">Mở báo sai POI →</a>
+      </div>
+
+      <div class="report-content scenario-block">
+        <h3>T9 — Không thanh toán trong app <span class="badge badge-dont-act">Don't Act</span></h3>
+        <p>Chuẩn bị đặt phòng: xem tóm tắt, form thanh toán bị khóa, banner cảnh báo rõ — chuyển sang trang đối tác để hoàn tất.</p>
+        <a href="pages/booking.html#t9" class="ext-link">Mở màn Đặt phòng →</a>
+      </div>
+    </section>
+
+    <!-- §8 -->
+    <section class="report-section" id="section-8">
+      <div class="report-section-head">
+        <p class="section-label">Phần 4</p>
+        <h2>Act / Ask / Don't Act</h2>
+      </div>
+      <div class="report-content">
+        <p>Khung quyết định mức độ tự chủ của AI trong prototype:</p>
+        <table>
+          <thead>
+            <tr><th>Mức</th><th>AI được phép</th><th>Ví dụ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-act">Act</span></td>
+              <td>Thao tác rủi ro thấp, hoàn tác được</td>
+              <td>Điền checklist, gợi ý chip, highlight thay đổi</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-ask">Ask</span></td>
+              <td>Giả định lớn — cần user xác nhận</td>
+              <td>Tạo lịch trình, chọn phương án, thay quán ăn</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-dont-act">Don't Act</span></td>
+              <td>Hành động rủi ro cao — AI không làm</td>
+              <td>Thanh toán, đặt vé, gửi dữ liệu bên thứ ba</td>
+            </tr>
+          </tbody>
+        </table>
+        <p><strong>Nguyên tắc:</strong> Rủi ro thấp → Act · Giả định lớn → Ask · Khó hoàn tác → Don't Act.</p>
+      </div>
+    </section>
+
+    <!-- §9 -->
+    <section class="report-section" id="section-9">
+      <div class="report-section-head">
+        <p class="section-label">Phần 5</p>
+        <h2>Ma trận Feedback 2×2</h2>
+      </div>
+      <div class="report-content">
+        <p>Phản hồi giữa người dùng và hệ thống theo hai trục: <strong>tường minh</strong> (nút, form) và <strong>ngầm định</strong> (trạng thái UI).</p>
+        <table>
+          <thead>
+            <tr><th></th><th>Tường minh</th><th>Ngầm định</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>User → System</strong></td>
+              <td>Báo POI sai; chọn lý do; chỉnh lịch qua modal/chat</td>
+              <td>Hoàn tác; bỏ dở wizard</td>
+            </tr>
+            <tr>
+              <td><strong>System → User</strong></td>
+              <td>Progress checklist; banner đang xử lý; toast sau chỉnh sửa</td>
+              <td>Checklist mờ; nút tạo lịch disabled; badge Nháp/Đã chốt; cảnh báo ngày dày</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Chi tiết từng ô: <a href="pages/feedback.html" class="ext-link">Ma trận feedback đầy đủ</a></p>
+      </div>
+    </section>
+
+    <!-- §10 -->
+    <section class="report-section" id="section-10">
+      <div class="report-section-head">
+        <p class="section-label">Phần 6</p>
+        <h2>Explainability &amp; đánh giá lab</h2>
+      </div>
+      <div class="report-content">
+        <p><strong>Giải thích thiết kế trong sản phẩm:</strong></p>
+        <ul>
+          <li>Mỗi phương án lịch trình hiển thị <strong>tiêu chí ưu tiên</strong> — user hiểu vì sao AI đề xuất</li>
+          <li>Thông tin địa điểm có <strong>nguồn tham khảo</strong> — user tự quyết có tin hay không</li>
+        </ul>
+        <p><strong>Đáp ứng yêu cầu lab:</strong></p>
+        <table>
+          <thead>
+            <tr><th>Yêu cầu</th><th>Trong prototype</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Onboarding</td><td>T0 — 3 bước làm quen</td></tr>
+            <tr><td>≥2 kịch bản tương tác</td><td>T2 hỏi thêm, T4 chọn phương án</td></tr>
+            <tr><td>≥2 kịch bản phục hồi</td><td>T6 lịch dày, T7 POI sai</td></tr>
+            <tr><td>Act / Ask / Don't Act</td><td>Gắn nhãn trên UI</td></tr>
+            <tr><td>Feedback 2×2</td><td>Ma trận + rationale</td></tr>
+            <tr><td>Nhiều nhánh demo</td><td>Luồng đầy đủ landing → booking</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <strong>Quyết định then chốt:</strong> Mọi lịch trình là <span class="badge badge-draft">Bản nháp</span> cho đến khi user <strong>Chốt lịch trình</strong> — chỉ sau đó mới chuyển sang đặt phòng.
+        </div>
+        <p style="margin-top:0.75rem;"><strong>Hạn chế:</strong> Dữ liệu minh họa, chưa phản ánh giá và giờ mở cửa thực tế.</p>
+      </div>
+    </section>
+
+    <footer class="report-footer">
+      <p>VinTravel Prototype · Báo cáo Day 18</p>
+      <p>
+        <a href="report-day20.html" class="ext-link">Báo cáo Day 20</a>
+        <a href="report-day21.html" class="ext-link">Báo cáo Day 21</a>
+        <a href="index.html" class="ext-link">Prototype</a>
+        <a href="pages/feedback.html" class="ext-link">Feedback</a>
+        <a href="pages/rationale.html" class="ext-link">Rationale</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('a.ext-link').forEach((a) => {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    });
+  </script>
+</body>
+</html>

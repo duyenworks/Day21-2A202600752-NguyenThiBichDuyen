@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding Day 18 (tham chiếu) — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="../index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="onboarding.html">Onboarding mới (Day 20)</a>
+      <a href="../report-day20.html">Báo cáo Day 20</a>
+    </nav>
+  </div>
+
+  <div class="card" style="max-width:640px;margin:1rem auto;background:#fff9e6;border-color:var(--color-gold);">
+    <strong>Tham chiếu Day 18</strong> — Flow onboarding 3 bước trước khi tối ưu Day 20. Dùng để so sánh Before/After trong báo cáo.
+  </div>
+
+  <div class="onboarding-steps">
+    <div class="onboarding-step active" data-step="1">
+      <p style="font-size:0.85rem;color:var(--color-gray-400);margin-bottom:0.5rem;">Bước 1 / 3 · Day 18</p>
+      <h1 style="font-size:2rem;margin:0 0 1rem;">Xin chào! Mình là trợ lý lịch trình VinTravel.</h1>
+      <div class="card" style="margin:1.5rem 0;">
+        <h3 style="margin-bottom:0.75rem;">Mình có thể giúp bạn:</h3>
+        <ul style="padding-left:1.25rem;font-size:0.95rem;line-height:1.8;">
+          <li>Lên lịch trình theo ngày, theo sở thích (văn hóa, thiên nhiên, ẩm thực)</li>
+          <li>Đề xuất vài phương án để bạn chọn — không ép một lộ trình duy nhất</li>
+          <li>Điều chỉnh khi lịch quá dày hoặc thông tin địa điểm chưa chính xác</li>
+        </ul>
+        <p style="margin-top:1.25rem;font-size:0.9rem;color:var(--color-gray-600);">
+          VinTravel <strong>không</strong> tự đặt vé máy bay, thanh toán khách sạn hay tour thay bạn.
+        </p>
+      </div>
+      <button class="btn btn-primary" data-next="2">Tiếp tục</button>
+      <button class="btn btn-ghost btn-sm" style="margin-left:0.5rem;" id="skip-all">Bỏ qua</button>
+    </div>
+
+    <div class="onboarding-step" data-step="2">
+      <p style="font-size:0.85rem;color:var(--color-gray-400);margin-bottom:0.5rem;">Bước 2 / 3 · Day 18</p>
+      <h1 style="font-size:2rem;margin:0 0 1rem;">Bạn luôn là người quyết định</h1>
+      <div class="card" style="margin:1.5rem 0;">
+        <p style="margin-bottom:1rem;">Mọi lịch trình ban đầu là <span class="badge badge-draft">Bản nháp</span>.</p>
+        <div style="display:grid;gap:0.75rem;font-size:0.95rem;">
+          <div>✓ Sửa, xóa hoặc thêm từng hoạt động</div>
+          <div>✓ Hoàn tác thay đổi bất cứ lúc nào</div>
+          <div>✓ Báo nếu thông tin địa điểm không còn đúng</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary" data-next="1">Quay lại</button>
+      <button class="btn btn-primary" data-next="3">Tiếp tục</button>
+    </div>
+
+    <div class="onboarding-step" data-step="3">
+      <p style="font-size:0.85rem;color:var(--color-gray-400);margin-bottom:0.5rem;">Bước 3 / 3 · Day 18</p>
+      <h1 style="font-size:2rem;margin:0 0 0.5rem;">Bạn muốn đi đâu?</h1>
+      <p style="color:var(--color-gray-600);margin-bottom:1rem;">Chọn gợi ý hoặc gõ điểm đến của bạn.</p>
+      <div class="chips">
+        <button class="chip region-chip" data-region="Đà Nẵng – Hội An">Đà Nẵng – Hội An</button>
+        <button class="chip region-chip" data-region="Quảng Bình – Phong Nha">Quảng Bình</button>
+      </div>
+      <div class="input-box" style="margin-top:1rem;">
+        <input type="text" id="region-input" placeholder="Hoặc nhập điểm đến…">
+      </div>
+      <div style="margin-top:1.5rem;display:flex;gap:0.75rem;">
+        <button class="btn btn-secondary" data-next="2">Quay lại</button>
+        <button class="btn btn-primary" id="finish-onboarding">Bắt đầu lập kế hoạch</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script>
+    const showStep = (n) => {
+      document.querySelectorAll('.onboarding-step').forEach((el) => {
+        el.classList.toggle('active', +el.dataset.step === n);
+      });
+    };
+    document.querySelectorAll('[data-next]').forEach((btn) => {
+      btn.addEventListener('click', () => showStep(+btn.dataset.next));
+    });
+    document.querySelectorAll('.region-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.getElementById('region-input').value = chip.dataset.region;
+      });
+    });
+    const goPlan = (dest) => {
+      VinTravelState.save({ destination: dest || 'Đà Nẵng – Hội An', onboardingDone: true });
+      window.location.href = 'plan-trip.html';
+    };
+    document.getElementById('finish-onboarding').addEventListener('click', () => {
+      goPlan(document.getElementById('region-input').value.trim());
+    });
+    document.getElementById('skip-all').addEventListener('click', () => goPlan());
+  </script>
+</body>
+</html>

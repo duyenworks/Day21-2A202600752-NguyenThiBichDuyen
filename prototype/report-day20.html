@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Day 20 — VinTravel</title>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/report.css">
+</head>
+<body class="report-page report-day20">
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+  <div class="top-bar">
+    <a href="index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="index.html" class="ext-link">Prototype</a>
+      <a href="report.html" class="ext-link">Báo cáo Day 18</a>
+      <a href="report-day21.html" class="ext-link">Báo cáo Day 21</a>
+    </nav>
+  </div>
+
+  <div class="report-wrap">
+    <header class="report-hero">
+      <p class="section-label">Day 20 · Retention &amp; Habit Loop</p>
+      <h1>VinTravel — Giữ chân người lập lịch</h1>
+      <p class="tagline">Use case, core action, onboarding tối ưu, metric và habit loop — bổ sung trên prototype Day 18.</p>
+      <p class="report-team">
+        <span class="report-team-label">Nhóm thực hiện</span>
+        <span class="team-member-name">Hoàng Đức Trường</span>
+        <span class="team-member-name">Nguyễn Thị Bích Duyên</span>
+        <span class="team-member-name">Vương Nguyệt Bình</span>
+      </p>
+      <div class="report-hero-stats">
+        <div class="report-hero-stat">
+          <span class="hero-stat-num">−50%</span>
+          <span class="hero-stat-cap">bước onboarding<br>6–8 → 3–4</span>
+        </div>
+        <div class="report-hero-stat report-hero-stat--accent">
+          <span class="hero-stat-num">NSM</span>
+          <span class="hero-stat-cap">lịch chốt / 100<br>người lập kế hoạch</span>
+        </div>
+        <div class="report-hero-stat">
+          <span class="hero-stat-num">7 ngày</span>
+          <span class="hero-stat-cap">cửa sổ retention<br>quay lại chỉnh lịch</span>
+        </div>
+      </div>
+    </header>
+
+    <nav class="report-toc" aria-label="Mục lục">
+      <h2>Mục lục</h2>
+      <ol>
+        <li><a href="#use-case">Use case &amp; người dùng</a></li>
+        <li><a href="#core-metric">Core action &amp; retention</a></li>
+        <li><a href="#onboarding">Onboarding → giá trị đầu tiên</a></li>
+        <li><a href="#metrics">North Star &amp; đo lường</a></li>
+        <li><a href="#habit">Nature, nurture &amp; habit</a></li>
+        <li><a href="#tracking">Tracking</a></li>
+      </ol>
+    </nav>
+
+    <section class="report-section" id="use-case">
+      <div class="report-section-head" data-num="1">
+        <p class="section-label">Phần 1</p>
+        <h2>Use case &amp; người dùng</h2>
+        <p class="report-lead">Một use case: <strong>tự lập lịch chuyến đi tự túc</strong> (không gồm chat khám phá chung).</p>
+      </div>
+
+      <div class="framework-table">
+        <div class="framework-row">
+          <span class="framework-num">1</span>
+          <div>
+            <span class="framework-label">Vấn đề — lời user</span>
+            <p>“Tôi muốn đi Đà Nẵng – Hội An 4 ngày nhưng không biết xếp lịch hợp lý — sợ một ngày quá nhiều điểm, quán ăn không khớp gu nhóm.”</p>
+          </div>
+        </div>
+        <div class="framework-row">
+          <span class="framework-num">2</span>
+          <div>
+            <span class="framework-label">Persona</span>
+            <p>Cặp đôi / bạn bè 25–35, ít kinh nghiệm tự túc miền Trung — giống user chọn chip <a href="index.html" class="ext-link">“Đà Nẵng – Hội An”</a> trên trang chủ.</p>
+          </div>
+        </div>
+        <div class="framework-row">
+          <span class="framework-num">3</span>
+          <div>
+            <span class="framework-label">The Why</span>
+            <p>Có lịch <strong>đáng tin, sửa được</strong> — bớt stress trước chuyến đi.</p>
+          </div>
+        </div>
+        <div class="framework-row">
+          <span class="framework-num">4</span>
+          <div>
+            <span class="framework-label">Alternative</span>
+            <p>Google, blog, Excel, hỏi bạn / Facebook — <strong>vài lần/tuần</strong> trong 1–2 tuần trước khi đi.</p>
+          </div>
+        </div>
+        <div class="framework-row">
+          <span class="framework-num">5</span>
+          <div>
+            <span class="framework-label">Tần suất tự nhiên</span>
+            <p class="report-freq-line">
+              <span class="freq-pill">Daily</span> khi lập kế hoạch (3–10 ngày)
+              <span class="freq-arrow">→</span>
+              <span class="freq-pill">Vài tháng/lần</span> giữa các chuyến
+              <span class="freq-arrow">→</span>
+              <span class="freq-pill freq-pill--muted">Gần như không</span> khi đang đi
+            </p>
+          </div>
+        </div>
+        <div class="framework-row framework-row--highlight">
+          <span class="framework-num">✓</span>
+          <div>
+            <span class="framework-label">Retention metric (preview)</span>
+            <p><strong>% user quay lại chỉnh lịch trong 7 ngày</strong> sau khi xem Review — metric phù hợp nhịp lập kế hoạch theo đợt, không phải DAU.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="report-note" style="margin-top:0.75rem;">Anti-persona: mua tour trọn gói; đặt phút chót; chỉ dùng <a href="pages/chat.html" class="ext-link">Trợ lý AI</a> hỏi đáp, không cần lịch theo ngày.</p>
+    </section>
+
+    <section class="report-section" id="core-metric">
+      <div class="report-section-head" data-num="2">
+        <p class="section-label">Phần 2</p>
+        <h2>Core action &amp; retention</h2>
+      </div>
+
+      <div class="metric-strip">
+        <div class="metric-strip-row">
+          <span class="metric-strip-num">1</span>
+          <span class="metric-strip-key">Use case</span>
+          <div class="metric-strip-val">
+            <p>Tự lập lịch chuyến đi tự túc — không gồm chat khám phá chung.</p>
+          </div>
+        </div>
+        <div class="metric-strip-row">
+          <span class="metric-strip-num">2</span>
+          <span class="metric-strip-key">Natural cadence</span>
+          <div class="metric-strip-val">
+            <p><span class="cadence-pill">Theo đợt</span> — daily chỉ trong cửa sổ lập kế hoạch 1–2 tuần; vài chuyến/năm giữa các đợt.</p>
+          </div>
+        </div>
+        <div class="metric-strip-row">
+          <span class="metric-strip-num">3</span>
+          <span class="metric-strip-key">Core action</span>
+          <div class="metric-strip-val">
+            <p>Chọn phương án trên <a href="pages/itineraries.html" class="ext-link">Chọn phương án</a> → bấm <strong>“Xem lịch trình chi tiết”</strong> → thấy lịch nháp theo ngày trên <a href="pages/review.html" class="ext-link">Review</a>.</p>
+          </div>
+        </div>
+        <div class="metric-strip-row">
+          <span class="metric-strip-num">4</span>
+          <span class="metric-strip-key">Active user</span>
+          <div class="metric-strip-val">
+            <p>Hoàn thành core action <strong>≥1 lần trong 14 ngày</strong> lập kế hoạch. Activation / aha: banner <em>“Đây là lịch nháp của bạn”</em> + lịch theo ngày.</p>
+          </div>
+        </div>
+        <div class="metric-strip-row metric-strip-row--goal">
+          <span class="metric-strip-num">✓</span>
+          <span class="metric-strip-key">Metric thật sự</span>
+          <div class="metric-strip-val">
+            <p><strong>% quay lại chỉnh lịch trong 7 ngày</strong> sau khi xem Review.</p>
+            <p style="margin-top:0.35rem;font-size:0.82rem;color:var(--color-gray-500);">Dài hạn: % quay lại lập chuyến mới trong <strong>90 ngày</strong>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Không dùng DAU</strong> — nhịp sản phẩm theo cửa sổ lập kế hoạch, không phải app dùng hàng ngày cả năm.
+      </div>
+    </section>
+
+    <section class="report-section" id="onboarding">
+      <div class="report-section-head" data-num="3">
+        <p class="section-label">Phần 3</p>
+        <h2>Onboarding → giá trị đầu tiên</h2>
+        <p class="report-lead">Audit flow Day 18 và bản tối ưu trên prototype.</p>
+      </div>
+
+      <div class="report-flow-compare">
+        <div class="report-flow-col report-flow-col--before">
+          <div class="report-flow-col-head">
+            <span class="flow-tag flow-tag--before">Day 18</span>
+            <a href="pages/onboarding-day18.html" class="ext-link flow-link">Onboarding 3 bước</a>
+          </div>
+          <div class="report-journey">
+            <span><a href="index.html" class="ext-link">Trang chủ</a></span><span class="journey-dot">→</span>
+            <span>Onboarding ×3</span><span class="journey-dot">→</span>
+            <span><a href="pages/plan-trip.html" class="ext-link">Checklist ×5</a></span><span class="journey-dot">→</span>
+            <span>Variant</span><span class="journey-dot">→</span>
+            <span class="journey-highlight">Review</span>
+          </div>
+          <ul class="report-audit-list">
+            <li><span class="report-day20-badge audit-delay">Delay</span> Onboarding bước 1–2</li>
+            <li><span class="report-day20-badge audit-simplify">Simplify</span> Checklist 5 field</li>
+            <li><span class="report-day20-badge audit-keep">Keep</span> Chọn variant + Review</li>
+            <li><span class="report-day20-badge audit-keep">Keep</span> <a href="pages/review.html#t6" class="ext-link">Recovery T6</a></li>
+          </ul>
+          <p class="report-estimate">6–8 bước · 5 trường bắt buộc · ~3–5 phút tới lịch nháp</p>
+        </div>
+
+        <div class="report-flow-col report-flow-col--after">
+          <div class="report-flow-col-head">
+            <span class="flow-tag flow-tag--after">Day 20</span>
+            <a href="index.html" class="ext-link flow-link">Trang chủ</a>
+          </div>
+          <div class="report-journey">
+            <span>Chip điểm đến</span><span class="journey-dot">→</span>
+            <span><a href="pages/plan-trip.html" class="ext-link">Lập kế hoạch</a></span><span class="journey-dot">→</span>
+            <span><a href="pages/itineraries.html" class="ext-link">Variant</a></span><span class="journey-dot">→</span>
+            <span class="journey-highlight">Review</span>
+          </div>
+          <ul class="report-change-list">
+            <li>
+              <strong>Vào thẳng lập kế hoạch</strong>
+              <span>Chip <em>Đà Nẵng – Hội An</em> → <a href="pages/plan-trip.html" class="ext-link">Lập kế hoạch</a></span>
+            </li>
+            <li>
+              <strong>Onboarding 1 màn</strong>
+              <span><a href="pages/onboarding.html" class="ext-link">Giới thiệu nhanh</a> + <em>Xem phương án ngay</em></span>
+            </li>
+            <li>
+              <strong>Quick path</strong>
+              <span>Ngân sách / phong cách hỏi sau khi đã thấy phương án</span>
+            </li>
+            <li>
+              <strong>Evidence of value</strong>
+              <span>Banner lịch nháp + tiến độ chuẩn bị trên <a href="pages/review.html" class="ext-link">Review</a></span>
+            </li>
+          </ul>
+          <p class="report-estimate report-estimate--good">3–4 bước · 1 trường bắt buộc · ~1–2 phút tới lịch nháp</p>
+        </div>
+      </div>
+
+      <div class="onboarding-win">
+        <div class="onboarding-win-item">
+          <span class="win-num">~50%</span>
+          <span class="win-cap">ít bước hơn<br><small>6–8 → 3–4 bước</small></span>
+        </div>
+        <div class="onboarding-win-item">
+          <span class="win-num">1/5</span>
+          <span class="win-cap">trường bắt buộc<br><small>5 → 1 trường</small></span>
+        </div>
+        <div class="onboarding-win-item">
+          <span class="win-num">~2.5×</span>
+          <span class="win-cap">nhanh tới lịch nháp<br><small>3–5 phút → 1–2 phút</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="report-section" id="metrics">
+      <div class="report-section-head" data-num="4">
+        <p class="section-label">Phần 4</p>
+        <h2>North Star &amp; đo lường</h2>
+      </div>
+
+      <div class="report-funnel">
+        <p class="report-funnel-title">Funnel chuyển đổi <span>(số minh họa)</span></p>
+        <div class="funnel-bar" style="--w:100%;">
+          <span class="funnel-fill"><span class="funnel-label">Khách vào — trang chủ</span></span>
+          <span class="funnel-pct">100%</span>
+        </div>
+        <div class="funnel-bar" style="--w:60%;">
+          <span class="funnel-fill"><span class="funnel-label">Kích hoạt — thấy lịch nháp</span></span>
+          <span class="funnel-pct">60%</span>
+        </div>
+        <div class="funnel-bar" style="--w:35%;">
+          <span class="funnel-fill"><span class="funnel-label">Quay lại chỉnh — 7 ngày</span></span>
+          <span class="funnel-pct">35%</span>
+        </div>
+        <div class="funnel-bar funnel-bar--goal" style="--w:20%;">
+          <span class="funnel-fill"><span class="funnel-label">Chốt → đặt phòng (NSM)</span></span>
+          <span class="funnel-pct">20%</span>
+        </div>
+      </div>
+
+      <div class="metric-flow-wrap">
+        <div class="metric-flow">
+          <div class="metric-flow-col">
+            <h4>Input — hành vi prototype</h4>
+            <ul>
+              <li>Chọn chip điểm đến — <a href="index.html" class="ext-link">trang chủ</a></li>
+              <li><em>Xem phương án ngay</em> — quick path</li>
+              <li><a href="pages/review.html#t6" class="ext-link">Recovery T6</a> / <a href="pages/review.html#t7" class="ext-link">báo POI T7</a></li>
+            </ul>
+          </div>
+          <div class="metric-flow-arrow" aria-hidden="true">→</div>
+          <div class="metric-flow-col">
+            <h4>Kết quả trung gian</h4>
+            <ul>
+              <li>Thấy lịch nháp trên <a href="pages/review.html" class="ext-link">Review</a></li>
+              <li>Quay lại chỉnh trong 7 ngày</li>
+              <li>Tiến độ chuẩn bị tăng</li>
+            </ul>
+          </div>
+          <div class="metric-flow-arrow" aria-hidden="true">→</div>
+          <div class="metric-flow-col metric-flow-col--output">
+            <h4>Output — North Star</h4>
+            <p>Lịch chốt / 100 planners
+              <span class="table-sub">“Chốt lịch trình” → <a href="pages/booking.html" class="ext-link">Đặt phòng</a></span>
+            </p>
+          </div>
+        </div>
+
+        <div class="leading-lagging-bar" role="img" aria-label="Leading indicator đến NSM đến Lagging indicator">
+          <span class="ll-leading">Leading — chỉ báo sớm</span>
+          <span class="ll-nsm">NSM</span>
+          <span class="ll-lagging">Lagging — chốt → đặt phòng</span>
+        </div>
+      </div>
+
+      <div class="nsm-check-wrap">
+        <div class="nsm-checklist">
+          <h4>NSM VinTravel có đúng chuẩn?</h4>
+          <ul>
+            <li>Thể hiện giá trị — user có lịch chốt, sẵn sàng đặt phòng</li>
+            <li>Leading cho kết quả kinh doanh — dự báo conversion đặt phòng</li>
+            <li>Không vanity — không đếm pageview hay session rỗng</li>
+            <li>Hành động được — onboarding, recovery ảnh hưởng trực tiếp</li>
+            <li>Dễ hiểu / đo được — 1 số, 1 hành vi rõ ràng</li>
+          </ul>
+        </div>
+      </div>
+
+      <table class="report-table">
+        <thead><tr><th>Chỉ số</th><th>Ý nghĩa trong prototype</th><th>Loại</th></tr></thead>
+        <tbody>
+          <tr class="report-table-row--highlight">
+            <td><strong>North Star</strong><br><span class="table-sub">Lịch chốt / 100 planners</span></td>
+            <td><strong>“Chốt lịch trình”</strong> trên <a href="pages/review.html" class="ext-link">Review</a> → <a href="pages/booking.html" class="ext-link">Đặt phòng</a></td>
+            <td><span class="type-pill type-pill--goal">NSM</span></td>
+          </tr>
+          <tr><td>Tỷ lệ kích hoạt (24h)</td><td>Vào app → thấy Review trong ngày đầu</td><td><span class="type-pill">Leading</span></td></tr>
+          <tr><td>Time to First Core Action</td><td><a href="index.html" class="ext-link">Trang chủ</a> → Review</td><td><span class="type-pill">Leading</span></td></tr>
+          <tr><td>Quay lại chỉnh (7 ngày)</td><td>Retention trong planning window</td><td><span class="type-pill">Leading</span></td></tr>
+          <tr><td>Chốt → đặt phòng</td><td>% confirmed mở booking</td><td><span class="type-pill type-pill--lag">Lagging</span></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <strong>Trade-off:</strong> Onboarding ngắn hơn tăng kích hoạt, nhưng có thể tăng recovery — <a href="pages/review.html#t6" class="ext-link">lịch quá dày</a>, <a href="pages/review.html#t7" class="ext-link">POI sai</a>.
+      </div>
+    </section>
+
+    <section class="report-section" id="habit">
+      <div class="report-section-head" data-num="5">
+        <p class="section-label">Phần 5</p>
+        <h2>Nature, nurture &amp; habit</h2>
+        <p class="report-lead">Habit phù hợp trong <strong>cửa sổ chuẩn bị</strong> — không ép dùng hàng ngày cả năm.</p>
+      </div>
+
+      <p class="hook-canvas-label"><span class="hook-loop-icon">↻</span> Vòng lặp thói quen: Trigger → Action → Variable Reward → Investment → <em>trigger kế tiếp</em></p>
+      <div class="hook-canvas">
+        <span class="hook-loop-badge" aria-hidden="true">Habit<br>loop</span>
+        <div class="hook-quadrant hook-quadrant--trigger">
+          <h4>1. Trigger</h4>
+          <p><strong>Internal:</strong> “Còn 2 tuần mà chưa có lịch cụ thể.”</p>
+          <span class="hook-sub">External: banner tiến độ trên <a href="pages/review.html" class="ext-link">Review</a></span>
+        </div>
+        <div class="hook-quadrant hook-quadrant--action">
+          <h4>2. Action</h4>
+          <p>Chỉnh lịch — <a href="pages/review.html#t6" class="ext-link">Recovery T6</a> hoặc <a href="pages/review.html#t7" class="ext-link">báo POI T7</a>.</p>
+          <span class="hook-sub">Hành động đơn giản nhất trước phần thưởng.</span>
+        </div>
+        <div class="hook-quadrant hook-quadrant--invest">
+          <h4>4. Investment</h4>
+          <p>Lịch đã chỉnh được lưu — có hoàn tác; user bỏ công sức vào sản phẩm.</p>
+        </div>
+        <div class="hook-quadrant hook-quadrant--reward">
+          <h4>3. Variable Reward</h4>
+          <p>Lịch nhẹ hơn; % tiến độ chuẩn bị tăng — đủ tốt để muốn quay lại.</p>
+        </div>
+      </div>
+
+      <div class="trigger-map">
+        <div class="trigger-card trigger-card--internal">
+          <h4>Internal trigger</h4>
+          <p>Lo lịch chưa xong, uncertainty trước chuyến đi — cảm xúc tự nảy sinh, không cần quảng cáo.</p>
+          <span class="trigger-tag">Trigger mạnh nhất cho VinTravel</span>
+        </div>
+        <div class="trigger-card trigger-card--owned">
+          <h4>Owned nurture</h4>
+          <p>Banner tiến độ Review, nhắc chốt lịch gần ngày đi — chiếm “real estate” trong planning window.</p>
+          <span class="trigger-tag">Chìa khóa retention</span>
+        </div>
+      </div>
+
+      <div class="nurture-timeline-wrap">
+        <h4>Cửa sổ lập kế hoạch 1–2 tuần — core vs nature vs nurture</h4>
+        <div class="nurture-timeline">
+          <div class="nurture-lane nurture-lane--core">
+            <strong>Core action</strong>
+            Xem Review · chỉnh lịch · chốt bản nháp
+          </div>
+          <div class="nurture-lane nurture-lane--nature">
+            <strong>Nature</strong>
+            Tìm quán / điểm trên Google, hỏi bạn — song song với lập lịch
+          </div>
+          <div class="nurture-lane nurture-lane--nurture">
+            <strong>Nurture</strong>
+            Banner tiến độ · nhắc recovery — duy trì hiện diện không spam
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1rem;">
+        <strong>Không ép daily cả năm</strong> — nurture bám nhịp chuẩn bị; giữa các chuyến user gần như không quay lại.
+      </div>
+    </section>
+
+    <section class="report-section" id="tracking">
+      <div class="report-section-head" data-num="6">
+        <p class="section-label">Phần 6</p>
+        <h2>Tracking</h2>
+        <p class="report-lead">Ánh xạ hành vi prototype → metric. Chi tiết: <a href="pages/tracking-spec.html" class="ext-link">Bản đồ event</a>.</p>
+      </div>
+
+      <table class="report-table">
+        <thead><tr><th>Hành vi</th><th>Metric</th></tr></thead>
+        <tbody>
+          <tr><td>Chọn chip điểm đến — <a href="index.html" class="ext-link">trang chủ</a></td><td>Funnel, time to core action</td></tr>
+          <tr><td><em>Xem phương án ngay</em> — <a href="pages/plan-trip.html" class="ext-link">Lập kế hoạch</a></td><td>Đường nhanh vs đầy đủ</td></tr>
+          <tr><td>Chọn variant → <a href="pages/review.html" class="ext-link">Review</a></td><td>Core action, activation rate</td></tr>
+          <tr><td>Chốt lịch / <a href="pages/review.html#t6" class="ext-link">recovery T6</a></td><td>North Star, trade-off onboarding</td></tr>
+        </tbody>
+      </table>
+
+      <div class="tracking-principles">
+        <h4>Nguyên tắc ghi event</h4>
+        <ul class="report-checklist">
+          <li>Ghi khi hành vi thật xảy ra</li>
+          <li>Không đếm trùng khi refresh Review</li>
+          <li>Đủ mã phiên, không thu thập PII thừa</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer class="report-footer">
+      <p>VinTravel · Day 20</p>
+      <p>
+        <a href="index.html" class="ext-link">Prototype</a>
+        <a href="report.html" class="ext-link">Báo cáo Day 18</a>
+        <a href="report-day21.html" class="ext-link">Báo cáo Day 21</a>
+        <a href="pages/tracking-spec.html" class="ext-link">Bản đồ event</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll('a.ext-link').forEach((a) => {
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    });
+
+    (function () {
+      var bar = document.querySelector('.reading-progress span');
+      if (!bar) return;
+      function update() {
+        var doc = document.documentElement;
+        var max = doc.scrollHeight - doc.clientHeight;
+        var pct = max > 0 ? (doc.scrollTop || document.body.scrollTop) / max * 100 : 0;
+        bar.style.width = pct + '%';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+  </script>
+</body>
+</html>

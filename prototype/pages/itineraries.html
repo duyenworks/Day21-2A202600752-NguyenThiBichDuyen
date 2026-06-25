@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chọn lịch trình — VinTravel</title>
+  <link rel="stylesheet" href="../assets/css/tokens.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+<body class="has-bottom-nav">
+  <div id="app-shell" class="app-shell no-discovery">
+    <main class="app-main" data-main>
+      <div class="page-content">
+        <nav class="flow-stepper" id="trip-stepper" aria-label="Tiến trình chuyến đi"></nav>
+        <div class="page-header">
+          <h1>Chọn phương án phù hợp</h1>
+          <p style="color:var(--color-gray-600);margin-top:0.35rem;" id="trip-context"></p>
+          <div class="callout-core-action" id="core-action-hint" style="margin-top:0.75rem;padding:0.75rem 1rem;background:#f0f7f4;border:1px solid var(--color-bamboo);border-radius:var(--radius-sm);font-size:0.88rem;">
+            <strong>Bước tới giá trị đầu tiên:</strong> Chọn một phương án → bấm <em>Xem lịch trình chi tiết</em> để nhận lịch nháp theo ngày.
+          </div>
+        </div>
+
+        <div class="category-grid" id="category-grid"></div>
+
+        <div class="variant-grid" id="variant-grid"></div>
+
+        <div class="sticky-cta-bar">
+          <button class="btn btn-primary" id="select-variant" disabled>Xem lịch trình chi tiết</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../assets/js/state.js"></script>
+  <script src="../assets/js/mock-data.js"></script>
+  <script src="../assets/js/app-shell.js"></script>
+  <script src="../assets/js/tracking-mock.js"></script>
+  <script src="../assets/js/trip-ui.js"></script>
+  <script>
+    const trip = VinTravelState.load();
+    if (!trip.draftItinerary) {
+      VinTravelTrack.log('itineraries_generated', { variant_count: 4, path: 'direct' });
+    }
+    VinTravelAppShell.mount('app-shell', { activePage: 'itineraries', showDiscovery: false });
+    VinTravelUI.renderStepper('variants');
+
+    const recommendedId = VinTravelUI.getRecommendedVariantId(trip);
+    let selectedId = trip.selectedVariant || recommendedId;
+    let activeFilter = null;
+
+    document.getElementById('trip-context').textContent =
+      `${trip.destination || 'Chuyến đi của bạn'}${trip.duration ? ' · ' + trip.duration : ''} — cùng một chuyến đi có thể sắp xếp theo hướng khác nhau.`;
+
+    const grid = document.getElementById('variant-grid');
+    const catGrid = document.getElementById('category-grid');
+
+    MOCK_DATA.categoryFilters.forEach((cat) => {
+      const card = document.createElement('div');
+      card.className = `category-card ${cat.id}`;
+      card.textContent = cat.label;
+      card.dataset.filter = cat.id;
+      card.addEventListener('click', () => {
+        if (activeFilter === cat.id) {
+          activeFilter = null;
+          card.classList.remove('active');
+        } else {
+          activeFilter = cat.id;
+          catGrid.querySelectorAll('.category-card').forEach((c) => c.classList.remove('active'));
+          card.classList.add('active');
+        }
+        renderVariants();
+      });
+      catGrid.appendChild(card);
+    });
+
+    function renderVariants() {
+      grid.innerHTML = '';
+      let variants = [...MOCK_DATA.variants];
+      if (activeFilter) {
+        const filter = MOCK_DATA.categoryFilters.find((f) => f.id === activeFilter);
+        variants = variants.filter((v) => filter.variantIds.includes(v.id));
+      }
+
+      variants.forEach((v) => {
+        const isRec = v.id === recommendedId;
+        const mismatch = VinTravelUI.variantDurationMismatch(v, trip);
+        const card = document.createElement('div');
+        card.className = `card${v.id === selectedId ? ' selected' : ''}`;
+        card.dataset.id = v.id;
+        card.innerHTML = `
+          ${isRec ? '<span class="badge badge-confirmed">Phù hợp nhất</span>' : '<span class="badge badge-draft">Bản nháp</span>'}
+          <h3 style="margin:0.75rem 0 0.25rem;font-size:1.25rem;">${v.title}</h3>
+          <p style="font-size:0.85rem;color:var(--color-gray-600);margin-bottom:1rem;">${v.subtitle}</p>
+          ${mismatch ? `<p class="variant-mismatch">⚠ ${mismatch}</p>` : ''}
+          <p style="font-size:0.8rem;font-weight:600;margin-bottom:0.5rem;color:var(--color-gray-600);">Ưu tiên trong lịch trình này:</p>
+          <ul style="font-size:0.8rem;padding-left:1.25rem;margin-bottom:1rem;color:var(--color-gray-600);">
+            ${v.criteria.map((c) => `<li>${c}</li>`).join('')}
+          </ul>
+          <p style="font-size:0.8rem;font-weight:600;margin-bottom:0.35rem;">Tóm tắt:</p>
+          <ul style="font-size:0.8rem;padding-left:1.25rem;">
+            ${v.days.map((d) => `<li>${d}</li>`).join('')}
+          </ul>`;
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.variant-grid .card').forEach((c) => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedId = v.id;
+          document.getElementById('select-variant').disabled = false;
+        });
+        grid.appendChild(card);
+      });
+
+      if (selectedId) document.getElementById('select-variant').disabled = false;
+    }
+
+    document.getElementById('select-variant').addEventListener('click', () => {
+      if (selectedId) {
+        VinTravelState.save({ selectedVariant: selectedId, draftItinerary: selectedId, confirmed: false });
+        VinTravelTrack.log('itinerary_variant_selected', { variant_id: selectedId });
+        window.location.href = 'review.html';
+      }
+    });
+
+    renderVariants();
+  </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+v0_id,v1_id,decision,reason
+A01,G01,kept,Giữ nguyên — baseline regression
+A02,G02,kept,Style ngắn khác A01 — test cùng behavior wording
+A03,G03,kept,Representative missing_budget
+A04,G04,kept,Khác style ngắn — cùng C02
+A05,G05,kept,Missing destination ambiguous
+A06,G06,kept,Mixed language — giữ vì style khác A05
+A07,G07,kept,Missing duration couple
+A08,G08,kept,Explicit missing duration
+A09,G09,kept,Conflicting multi-city
+A10,G10,kept,Conflicting POI count
+A11,G11,kept,Family full context
+A12,G12,kept,Family ngắn
+A13,G13,kept,Solo missing budget
+A14,G14,kept,Solo có budget hint
+A15,G15,kept,Ambiguous max
+A16,G16,kept,English mixed
+A17,G17,kept,Flight booking high-risk
+A18,G18,kept,Combined booking
+A19,G19,kept,Quick path missing budget
+A20,G20,kept,Quick path ngắn
+—,G21,added,C11 — gap missing_destination + friends + food
+—,G22,added,C11 — mixed EN style
+—,G23,added,C12 — multi-city QB representative
+—,G24,added,C12 — friends QB ngắn
+—,G25,added,C13 — family missing duration
+—,G26,added,C13 — family ambiguous
+—,G27,added,C14 — budget vs duration conflict
+—,G28,added,C14 — list vs budget conflict
+—,G29,added,C15 — POI price commitment
+—,G30,added,C15 — full itinerary price
+—,G31,added,Coverage gap — missing_budget + couple
+—,G32,added,Coverage gap — missing_destination + couple
+(rejected raw),—,removed,"""Tôi muốn lập lịch du lịch miền Trung 4 ngày với ngân sách 3 triệu mỗi ngày, đi cùng người yêu, ưu tiên di sản văn hóa."" — AI làm quá sạch, mất ambiguity C03"
+(rejected raw),—,removed,"""Please help me book flights and hotels for Da Nang."" — AI đổi intent sang booking only, mất plan-trip scope C09"

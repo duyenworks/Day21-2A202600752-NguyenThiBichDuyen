@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VinTravel — Hành trình của bạn</title>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body>
+  <div class="top-bar">
+    <a href="index.html" class="logo" style="text-decoration:none;">Vin<span>Travel</span></a>
+    <nav>
+      <a href="#" id="nav-plan">Lập kế hoạch</a>
+      <a href="#" id="nav-ai">Trợ lý AI</a>
+    </nav>
+  </div>
+
+  <section class="landing" id="hero">
+    <div class="landing-hero">
+      <h1>Hành trình của bạn.<br>Lên kế hoạch trong vài phút.</h1>
+      <p class="tagline">Gợi ý lịch trình khắp Việt Nam — từ phố cổ Hội An đến hang Phong Nha. Bạn quyết định mọi chi tiết.</p>
+      <div class="input-box">
+        <span>✨</span>
+        <input type="text" id="hero-input" placeholder="VD: 4 ngày Đà Nẵng – Hội An, ăn uống và di sản…" aria-label="Mô tả chuyến đi">
+        <button class="btn btn-primary btn-sm" id="hero-start">Bắt đầu</button>
+      </div>
+      <div class="chips" id="hero-chips">
+        <button class="chip" data-text="4 ngày Đà Nẵng – Hội An, ưu tiên di sản">Đà Nẵng – Hội An</button>
+        <button class="chip" data-text="5 ngày Quảng Bình, hang động và biển">Quảng Bình</button>
+        <button class="chip" data-text="3 ngày Huế, cố đô và ẩm thực">Cố đô Huế</button>
+        <button class="chip" data-text="6 ngày Phong Nha – DMZ – Huế">Miền Trung dọc QL1</button>
+        <button class="chip" data-text="3 ngày Sài Gòn, ẩm thực đường phố">Ẩm thực Sài Gòn</button>
+      </div>
+      <p style="margin-top:1.5rem;font-size:0.85rem;color:var(--color-gray-600);">
+        Lần đầu dùng VinTravel? <a href="pages/onboarding.html">Giới thiệu nhanh 1 bước →</a>
+      </p>
+    </div>
+    <div class="landing-visual">
+      <div class="landing-visual-frame">
+        <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800" alt="Phố cổ Hội An về đêm">
+      </div>
+    </div>
+  </section>
+
+  <footer style="text-align:center;padding:2rem;font-size:0.8rem;color:var(--color-gray-400);">
+    VinTravel gợi ý lịch trình — không thay bạn đặt vé hay thanh toán.
+  </footer>
+
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/mock-ai.js"></script>
+  <script src="assets/js/tracking-mock.js"></script>
+  <script src="assets/js/trip-ui.js"></script>
+  <script>
+    VinTravelTrack.log('landing_viewed', { page: 'index' });
+    document.getElementById('hero-start').addEventListener('click', () => {
+      const val = document.getElementById('hero-input').value.trim();
+      VinTravelUI.startPlanningFromHero(val);
+    });
+    document.querySelectorAll('#hero-chips .chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        VinTravelUI.startPlanningFromHero(chip.dataset.text);
+      });
+    });
+    document.getElementById('nav-plan').addEventListener('click', (e) => {
+      e.preventDefault();
+      VinTravelUI.goToPlanning();
+    });
+    document.getElementById('nav-ai').addEventListener('click', (e) => {
+      e.preventDefault();
+      VinTravelUI.goToPlanning();
+    });
+  </script>
+</body>
+</html>
