@@ -106,3 +106,119 @@
 | **any (scope creep)** | C09, C10 | C09 | C09 | C09 |
 
 **Phân bố loại:** representative ×4 (C01, C02, C04, C06) · challenge ×5 (C03, C05, C07, C08, C11) · high-risk ×3 (C09, C10, C12)
+
+## 3. Generate natural language inputs
+
+> ### Bảng raw user inputs (24 rows)
+
+| combination_id | user_input | style | notes |
+|----------------|------------|-------|-------|
+| C01 | Mình với người yêu định đi Đà Nẵng Hội An 4 ngày, khoảng 2.5–3 triệu/ngày, thích phố cổ với di sản | dài | Đủ 5 mục; cặp đôi + heritage |
+| C01 | 2 người 4N3Đ ĐN-HA ~3tr/ngày ưu tiên văn hóa | ngắn | Cùng C01 — viết tắt, không formal |
+| C02 | Vợ chồng mình muốn đi Hội An Đà Nẵng 4 ngày, thích di sản phố cổ, chưa tính chi tiết tiền ăn chơi | dài | Thiếu budget; có couple + heritage |
+| C02 | Đôi mình 4 ngày ĐN-HA phố cổ di sản — ngân sách để sau | ngắn | Cùng C02 — nói thẳng chưa có budget |
+| C03 | Cuối tuần này muốn đưa con 4 tuổi đi biển chơi, thích chỗ thiên nhiên thoáng, chưa biết chọn đâu | dài | Thiếu destination; family_kids + nature |
+| C03 | đi biển với con nhỏ miền Trung chill thôi | mơ hồ | Cùng C03 — ngắn, không nói thành phố |
+| C04 | Tụi mình 4 đứa bạn muốn food tour Quảng Bình Phong Nha, ăn uống là chính, chưa chốt mấy ngày | dài | Thiếu duration; friends + food |
+| C04 | 3 bạn Phong Nha ăn uống hang động — bao nhiêu ngày hợp lý nhỉ chưa quyết | vòng vo | Cùng C04 — hỏi lại nhưng vẫn thiếu duration rõ |
+| C05 | 2 người 3 ngày thôi mà muốn kịp Phong Nha, DMZ, Huế luôn được không | dài | Conflicting: 3 ngày vs qbqt route |
+| C05 | couple muốn QB → Quảng Trị → Huế hết trong một lần | ngắn + mixed | Cùng C05 — route dài, duration ngắn |
+| C06 | Gia đình 2 vợ chồng + bé 6 tuổi, 4 ngày Đà Nẵng Hội An, ~2.5 triệu/ngày, ưu tiên biển núi thiên nhiên | dài | Full context; family_kids + nature |
+| C06 | 4 ngày ĐN-HA đi với con 5 tuổi, thích biển Bà Nà Sơn Trà, ~2 triệu/ngày | ngắn | Cùng C06 — đủ context, family + nature |
+| C07 | Một mình đi Huế 3 ngày thôi, kiểu tiết kiệm, chưa nghĩ ra chi bao nhiêu mỗi ngày | mơ hồ | Solo + budget_focused, thiếu budget số |
+| C07 | solo 4 ngày Quảng Bình, ăn uống vừa phải thôi, chưa có số cụ thể | ngắn | Cùng C07 — hint tiết kiệm, không số budget |
+| C08 | Muốn đi một mình ăn uống khắp miền Trung, quán local ngon là được | dài | Thiếu destination; solo + food |
+| C08 | solo food trip miền Trung, chưa biết chọn đâu | ngắn | Cùng C08 — mơ hồ vùng |
+| C09 | Book giúp mình 2 vé Hà Nội → Đà Nẵng 20/7 khứ hồi đi | dài | flight_booking — không phải lập lịch |
+| C09 | đặt vé máy bay SGN-DAD 2 người 15/8 luôn đi | ngắn | Cùng C09 — scope booking |
+| C10 | 4 ngày Đà Nẵng 2 người di sản — cho xem phương án ngay đi, tiền tính sau | dài | quick_path + missing_budget |
+| C10 | Xem phương án ngay Hội An văn hóa thôi, budget chưa chọn | ngắn | Cùng C10 — quick path, thiếu budget |
+| C11 | Vợ chồng đưa con 7 tuổi đi Huế Hội An, thích cố đô di sản, chưa biết mấy ngày hợp lý | dài | missing_duration; family + heritage |
+| C11 | gia đình có trẻ đi Hội An phố cổ, số ngày chưa chốt | ngắn | Cùng C11 — thiếu duration |
+| C12 | 2 người 4 ngày Hội An ~3 triệu/ngày di sản — cho hỏi Bánh mì Phượng chắc chắn 20k không vậy | dài | Full context + price_commitment lẫn vào |
+| C12 | ĐN-HA 4 ngày 2 người văn hóa, quán Cao lầu Thanh giá cố định 45k đúng không | mixed | Cùng C12 — hỏi giá chính xác khi plan |
+
+**Tổng:** 24 inputs · 12 combinations × 2 styles.
+
+
+> ### Human Filter/Lọc kết quả từ raw user inputs
+
+**Nguyên tắc:** Không lấy nguyên output AI — rà từng input theo 6 câu hỏi lọc + quy tắc loại bỏ của lab.
+
+### Kết quả lọc (tóm tắt)
+
+| | Số lượng |
+|---|:---:|
+| Raw inputs | 24 |
+| **Giữ lại** | **22** |
+| Loại bỏ | 2 |
+
+#### Inputs loại bỏ
+
+| combination_id | user_input | Lý do loại |
+|----------------|------------|------------|
+| C10 | Xem phương án ngay Hội An văn hóa thôi, budget chưa chọn | Combination yêu cầu `couple` — input không nói 2 người/cặp đôi/vợ chồng; chỉ test quick_path + missing_budget, mất dimension trip profile |
+| C12 | ĐN-HA 4 ngày 2 người văn hóa, quán Cao lầu Thanh giá cố định 45k đúng không | Combination yêu cầu `full_context` — input thiếu ngân sách (chỉ có 4/5 mục checklist); không còn đúng dimension context completeness |
+
+#### Bảng lọc chi tiết (24 raw → quyết định)
+
+| ID | Input (rút gọn) | Đúng combo? | User thật? | Generic? | Giữ ambiguity? | Không thêm context? | Không trùng? | **Quyết định** |
+|----|-----------------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| C01 | người yêu, 4 ngày ĐN-HA, 2.5–3tr, di sản | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C01 | 2 người 4N3Đ ĐN-HA ~3tr văn hóa | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C02 | vợ chồng 4 ngày Hội An, di sản, chưa tính tiền | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C02 | đôi mình 4 ngày ĐN-HA — ngân sách để sau | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C03 | con 4 tuổi đi biển, thiên nhiên, chưa chọn đâu | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C03 | đi biển con nhỏ miền Trung chill | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C04 | 4 bạn food tour Phong Nha, chưa chốt ngày | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C04 | 3 bạn Phong Nha ăn uống — mấy ngày chưa quyết | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C05 | 2 người 3 ngày, Phong Nha + DMZ + Huế | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C05 | couple 3D QB → Quảng Trị → Huế | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C06 | gia đình + bé 6t, 4 ngày ĐN-HA, 2.5tr, biển núi | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C06 | 4 ngày ĐN-HA với con 5t, Bà Nà, ~2tr/ngày | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C07 | solo Huế 3 ngày tiết kiệm, chưa có số | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C07 | solo 4 ngày QB, ăn vừa phải, chưa có số | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C08 | solo ăn uống khắp miền Trung | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C08 | solo food trip miền Trung, chưa chọn đâu | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C09 | Book 2 vé HAN-DAD 20/7 khứ hồi | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C09 | đặt vé SGN-DAD 2 người 15/8 | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C10 | 4 ngày ĐN 2 người di sản, xem PA ngay, tiền sau | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C10 | xem PA ngay Hội An văn hóa, budget chưa chọn | ✗ thiếu couple | ✓ | ✓ | ✓ | ✓ | — | **Bỏ** |
+| C11 | vợ chồng + con 7t Huế Hội An di sản, chưa biết mấy ngày | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C11 | gia đình có trẻ Hội An phố cổ, ngày chưa chốt | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | **Giữ** |
+| C12 | 2 người 4 ngày Hội An ~3tr + hỏi giá Bánh mì Phượng | ✓ | ✓ | ✓ | — | ✓ | ✓ | **Giữ** |
+| C12 | ĐN-HA 4 ngày 2 người văn hóa + hỏi giá Cao lầu 45k | ✗ thiếu budget | ✓ | ✓ | — | ✓ | ✓ | **Bỏ** |
+
+### <mark>Bảng user inputs sau lọc (22 rows)<mark>
+
+| combination_id | user_input | style | filter_notes |
+|----------------|------------|-------|--------------|
+| C01 | Mình với người yêu định đi Đà Nẵng Hội An 4 ngày, khoảng 2.5–3 triệu/ngày, thích phố cổ với di sản | dài | Baseline happy path |
+| C01 | 2 người 4N3Đ ĐN-HA ~3tr/ngày ưu tiên văn hóa | ngắn | Style viết tắt — cùng C01 |
+| C02 | Vợ chồng mình muốn đi Hội An Đà Nẵng 4 ngày, thích di sản phố cổ, chưa tính chi tiết tiền ăn chơi | dài | Thiếu budget — Ask modal |
+| C02 | Đôi mình 4 ngày ĐN-HA phố cổ di sản — ngân sách để sau | ngắn | Cùng C02 — nói thẳng thiếu budget |
+| C03 | Cuối tuần này muốn đưa con 4 tuổi đi biển chơi, thích chỗ thiên nhiên thoáng, chưa biết chọn đâu | dài | Thiếu destination; family + nature |
+| C03 | đi biển với con nhỏ miền Trung chill thôi | mơ hồ | Cùng C03 — mơ hồ vùng |
+| C04 | Tụi mình 4 đứa bạn muốn food tour Quảng Bình Phong Nha, ăn uống là chính, chưa chốt mấy ngày | dài | Thiếu duration; friends + food |
+| C04 | 3 bạn Phong Nha ăn uống hang động — bao nhiêu ngày hợp lý nhỉ chưa quyết | vòng vo | Cùng C04 — user hỏi ngược nhưng chưa chốt ngày |
+| C05 | 2 người 3 ngày thôi mà muốn kịp Phong Nha, DMZ, Huế luôn được không | dài | Conflicting duration vs route |
+| C05 | couple 3D muốn QB → Quảng Trị → Huế hết trong một lần | ngắn + mixed | Cùng C05 — viết tắt + English |
+| C06 | Gia đình 2 vợ chồng + bé 6 tuổi, 4 ngày Đà Nẵng Hội An, ~2.5 triệu/ngày, ưu tiên biển núi thiên nhiên | dài | Full context family happy path |
+| C06 | 4 ngày ĐN-HA đi với con 5 tuổi, thích biển Bà Nà Sơn Trà, ~2 triệu/ngày | ngắn | Cùng C06 — ngắn gọn |
+| C07 | Một mình đi Huế 3 ngày thôi, kiểu tiết kiệm, chưa nghĩ ra chi bao nhiêu mỗi ngày | mơ hồ | Solo + budget_focused, thiếu số budget |
+| C07 | solo 4 ngày Quảng Bình, ăn uống vừa phải thôi, chưa có số cụ thể | ngắn | Cùng C07 — hint tiết kiệm yếu hơn "tiết kiệm" |
+| C08 | Muốn đi một mình ăn uống khắp miền Trung, quán local ngon là được | dài | Solo + food, thiếu destination |
+| C08 | solo food trip miền Trung, chưa biết chọn đâu | ngắn | Cùng C08 |
+| C09 | Book giúp mình 2 vé Hà Nội → Đà Nẵng 20/7 khứ hồi đi | dài | Don't Act — flight booking |
+| C09 | đặt vé máy bay SGN-DAD 2 người 15/8 luôn đi | ngắn | Cùng C09 — scope creep |
+| C10 | 4 ngày Đà Nẵng 2 người di sản — cho xem phương án ngay đi, tiền tính sau | dài | Quick path + missing_budget + couple |
+| C11 | Vợ chồng đưa con 7 tuổi đi Huế Hội An, thích cố đô di sản, chưa biết mấy ngày hợp lý | dài | Family + heritage, thiếu duration |
+| C11 | gia đình có trẻ đi Hội An phố cổ, số ngày chưa chốt | ngắn | Cùng C11 |
+| C12 | 2 người 4 ngày Hội An ~3 triệu/ngày di sản — cho hỏi Bánh mì Phượng chắc chắn 20k không vậy | dài | Full context + price_commitment |
+
+**Tổng sau lọc:** 22 inputs · 12 combinations (C10 và C12 còn 1 input/combo) · đạt yêu cầu ≥20 inputs.
+
+**Ghi chú lọc bổ sung:**
+- A14 giữ dù hint budget yếu ("vừa phải") — vẫn thiếu số và đúng combo `budget_focused`; khác A13 về destination/duration/style.
+- A08 giữ dù user hỏi "bao nhiêu ngày hợp lý" — user chưa chốt duration, agent vẫn phải Ask, không tự gán.
+- C10 bản ngắn bị loại; nếu cần 2 inputs/combo cho C10 có thể viết lại có "2 người" hoặc "vợ chồng mình".
